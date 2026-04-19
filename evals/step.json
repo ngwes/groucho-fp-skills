@@ -1,0 +1,36 @@
+{
+  "scenarios": [
+    {
+      "id": "write-step-parse",
+      "critical": true,
+      "prompt": "Write a groucho-fp Step function that reads ctx.input (a string), parses it as an integer, and returns ctx with ctx.parsed set. Return Either.left if the input is not a valid number.",
+      "criteria": [
+        "The step function is async",
+        "The step returns Either.right with a spread of ctx plus the new parsed field",
+        "The step returns Either.left when the input is not a valid number",
+        "The code imports Either from '@ngwes/mini-fp'",
+        "The code imports or uses the Step type from 'groucho-fp'"
+      ]
+    },
+    {
+      "id": "frozen-context-immutability",
+      "critical": true,
+      "prompt": "Write a groucho-fp step that adds a 'validated: true' field to the context. Show the correct immutable pattern.",
+      "criteria": [
+        "The step uses spread syntax to create a new context object (e.g. { ...ctx, validated: true })",
+        "The step does not directly assign to ctx properties (no ctx.validated = ...)",
+        "The step returns Either.right with the new context"
+      ]
+    },
+    {
+      "id": "step-throws-vs-left",
+      "critical": false,
+      "prompt": "In groucho-fp, what is the difference between a step returning Either.left and a step throwing an exception? Which hook handles each case?",
+      "criteria": [
+        "The response states that Either.left triggers onLeft",
+        "The response states that a thrown exception triggers onException",
+        "The response distinguishes the two cases clearly"
+      ]
+    }
+  ]
+}

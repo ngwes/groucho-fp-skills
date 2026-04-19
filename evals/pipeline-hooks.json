@@ -1,0 +1,47 @@
+{
+  "scenarios": [
+    {
+      "id": "minimal-options-object",
+      "critical": true,
+      "prompt": "Write a complete PipelineOptions object for groucho-fp with all three required hooks. Use AppError = { code: string; detail: string } as the error type.",
+      "criteria": [
+        "The options object includes onLeft",
+        "The options object includes onException",
+        "The options object includes onConflictingKeys",
+        "onLeft returns Either.left",
+        "onException returns Either.left",
+        "onConflictingKeys returns Either.left"
+      ]
+    },
+    {
+      "id": "onLeft-propagate-and-log",
+      "critical": false,
+      "prompt": "Write an onLeft hook for a groucho-fp PipelineOptions that logs the error to the console and then propagates it.",
+      "criteria": [
+        "The hook accepts err and ctx parameters",
+        "The hook logs the error (e.g. console.error or console.log)",
+        "The hook returns Either.left(err)"
+      ]
+    },
+    {
+      "id": "onLeft-recovery",
+      "critical": false,
+      "prompt": "Write an onLeft hook for groucho-fp that recovers from the error by returning a default context instead of propagating the failure.",
+      "criteria": [
+        "The hook returns Either.right with a context object",
+        "The hook does not return Either.left",
+        "The code imports Either from '@ngwes/mini-fp'"
+      ]
+    },
+    {
+      "id": "onException-wrap",
+      "critical": true,
+      "prompt": "Write an onException hook for groucho-fp that wraps the thrown value into a structured error { code: 'EXCEPTION', detail: string }.",
+      "criteria": [
+        "The hook accepts the exception as its first parameter",
+        "The hook returns Either.left with code 'EXCEPTION'",
+        "The detail field is derived from the exception (e.g. String(ex) or ex.message)"
+      ]
+    }
+  ]
+}

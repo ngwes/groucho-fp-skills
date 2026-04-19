@@ -15,6 +15,7 @@ import { spawnSync } from 'child_process';
 import { readFileSync } from 'fs';
 import { join, dirname } from 'path';
 import { fileURLToPath } from 'url';
+import { tmpdir } from 'os';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const ROOT = join(__dirname, '..');
@@ -67,7 +68,7 @@ function runClaude(prompt, model) {
   const result = spawnSync(
     'claude',
     ['-p', prompt, '--model', model],
-    { encoding: 'utf8', timeout: 120_000, maxBuffer: 10 * 1024 * 1024 }
+    { encoding: 'utf8', timeout: 120_000, maxBuffer: 10 * 1024 * 1024, cwd: tmpdir() }
   );
   if (result.error) return `[ERROR: ${result.error.message}]`;
   if (result.status !== 0) return `[ERROR: exit ${result.status} — ${result.stderr?.trim()}]`;

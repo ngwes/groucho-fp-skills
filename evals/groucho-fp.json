@@ -1,0 +1,33 @@
+{
+  "scenarios": [
+    {
+      "id": "install-and-import",
+      "critical": true,
+      "prompt": "Show me how to install groucho-fp and import Pipeline from it in a TypeScript project.",
+      "criteria": [
+        "The response includes an npm install command for groucho-fp",
+        "The response shows an import statement from 'groucho-fp'",
+        "The response mentions @ngwes/mini-fp as a peer dependency"
+      ]
+    },
+    {
+      "id": "route-to-pipeline",
+      "critical": false,
+      "prompt": "I'm using groucho-fp. I need to run a series of async transformations over a shared object. Which concept or API should I learn about?",
+      "criteria": [
+        "The response mentions Pipeline",
+        "The response mentions Step functions",
+        "The response does not suggest using plain Promise chains or other non-groucho-fp patterns as the primary approach"
+      ]
+    },
+    {
+      "id": "route-to-dynamic-loading",
+      "critical": false,
+      "prompt": "I'm using groucho-fp. I want to load my step functions from separate files on disk at runtime. What should I look into?",
+      "criteria": [
+        "The response mentions loadStepsFromDir or loadSteps",
+        "The response does not suggest only static imports as the solution"
+      ]
+    }
+  ]
+}

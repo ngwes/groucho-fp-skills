@@ -1,0 +1,35 @@
+{
+  "scenarios": [
+    {
+      "id": "full-pipeline-from-dir",
+      "critical": true,
+      "prompt": "Write a complete TypeScript program using groucho-fp that loads steps from './steps' and runs a Pipeline over { userId: string }. Include options and result handling.",
+      "criteria": [
+        "The code imports both Pipeline and loadStepsFromDir from 'groucho-fp'",
+        "loadStepsFromDir is awaited before passing steps to Pipeline",
+        "The PipelineOptions object includes onLeft, onException, and onConflictingKeys",
+        "The Pipeline call is awaited",
+        "The result is handled (e.g. with fold or if/else on the Either)"
+      ]
+    },
+    {
+      "id": "error-handling-load-failure",
+      "critical": false,
+      "prompt": "Show how to safely handle a failure when loading steps with groucho-fp's loadStepsFromDir (e.g. a syntax error in a step file).",
+      "criteria": [
+        "The loadStepsFromDir call is wrapped in a try/catch",
+        "The catch block handles the error (e.g. logs and exits, or re-throws)"
+      ]
+    },
+    {
+      "id": "prefer-loadSteps-when-order-matters",
+      "critical": false,
+      "prompt": "When should I use loadSteps instead of loadStepsFromDir in groucho-fp? Give an example.",
+      "criteria": [
+        "The response mentions that loadSteps is preferred when execution order must differ from alphabetical",
+        "The response mentions or implies that loadSteps accepts an explicit array of file paths",
+        "The response includes a code example using loadSteps with an array of paths"
+      ]
+    }
+  ]
+}

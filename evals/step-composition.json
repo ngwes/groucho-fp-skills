@@ -1,0 +1,35 @@
+{
+  "scenarios": [
+    {
+      "id": "naming-convention",
+      "critical": true,
+      "prompt": "I'm using groucho-fp's loadStepsFromDir. How should I name my step files to control execution order?",
+      "criteria": [
+        "The response mentions numeric prefixes (e.g. 01-, 02-) in filenames",
+        "The response states that files are loaded in alphabetical order",
+        "The response provides or implies a concrete example of numbered filenames"
+      ]
+    },
+    {
+      "id": "split-io-and-transform",
+      "critical": false,
+      "prompt": "I have a groucho-fp step file '02-fetch-and-normalize-user.ts' that fetches a user from the DB and then normalizes the data. How should I restructure this?",
+      "criteria": [
+        "The response recommends splitting into two separate files",
+        "The response separates the IO concern (fetch) from the transformation concern (normalize)",
+        "The resulting filenames or descriptions maintain the numeric ordering convention"
+      ]
+    },
+    {
+      "id": "two-well-structured-steps",
+      "critical": false,
+      "prompt": "Write two groucho-fp step files: one that validates ctx.input is non-empty, and one that transforms ctx.input to uppercase. Use proper naming and immutability.",
+      "criteria": [
+        "There are two distinct step functions or files",
+        "The validate step returns Either.left when input is empty",
+        "The transform step spreads ctx when returning Either.right",
+        "Each step has a single responsibility"
+      ]
+    }
+  ]
+}
