@@ -1,0 +1,5 @@
+{
+  "name": "ngwes/groucho-fp",
+  "version": "0.0.1",
+  "description": "Skills for @ngwes/groucho-fp — a functional pipeline library for TypeScript built on `@ngwes/mini-fp`"
+}
