@@ -1,3 +1,10 @@
+# [1.1.0](https://gitlab.com/ngwes/skills/groucho-fp-skills/compare/v1.0.0...v1.1.0) (2026-04-19)
+
+
+### Features
+
+* add evaluation scenarios and benchmarks for groucho-fp skills ([4965b84](https://gitlab.com/ngwes/skills/groucho-fp-skills/commit/4965b8407ff81845f627e15ac194211f9f2fabe0))
+
 # 1.0.0 (2026-04-19)
 
 
