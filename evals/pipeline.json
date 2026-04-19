@@ -1,0 +1,39 @@
+{
+  "scenarios": [
+    {
+      "id": "basic-pipeline-usage",
+      "critical": true,
+      "prompt": "Write a TypeScript example using groucho-fp's Pipeline that takes a context { input: string } and runs a step that uppercases input.input into input.result. Include all required options.",
+      "criteria": [
+        "The code imports Pipeline from 'groucho-fp'",
+        "The code imports Either from '@ngwes/mini-fp'",
+        "The PipelineOptions object includes onLeft, onException, and onConflictingKeys hooks",
+        "The step spreads ctx when returning Either.right",
+        "The Pipeline call is awaited and the result is handled with fold or equivalent"
+      ]
+    },
+    {
+      "id": "pipeline-options-all-hooks",
+      "critical": true,
+      "prompt": "What are the three hooks required by PipelineOptions in groucho-fp? Show their signatures.",
+      "criteria": [
+        "The response mentions onLeft",
+        "The response mentions onException",
+        "The response mentions onConflictingKeys",
+        "The response shows that each hook receives the current context as a parameter",
+        "The response shows that each hook returns Promise<Either<E, Ctx>>"
+      ]
+    },
+    {
+      "id": "execution-model",
+      "critical": false,
+      "prompt": "Explain how groucho-fp's Pipeline executes steps and what happens when a step returns Either.left.",
+      "criteria": [
+        "The response states that steps run sequentially",
+        "The response states that the context is frozen or immutable before each step",
+        "The response states that returning Either.left stops the pipeline and triggers onLeft",
+        "The response states that subsequent steps are skipped after a left"
+      ]
+    }
+  ]
+}
