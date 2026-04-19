@@ -1,6 +1,6 @@
 {
-  "name": "ngwes/groucho-fp-skills",
-  "version": "1.0.0",
+  "name": "@ngwes/groucho-fp-skills",
+  "version": "0.0.1",
   "description": "Claude Code skill plugin for groucho-fp",
   "private": true,
   "type": "module",
