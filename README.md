@@ -1,6 +1,6 @@
 # groucho-fp-skills
 
-Claude Code skill plugin for [`groucho-fp`](https://www.npmjs.com/package/groucho-fp) — a functional pipeline library for TypeScript built on `@ngwes/mini-fp`.
+Claude Code skill plugin for [`@ngwes/groucho-fp`](https://www.npmjs.com/package/@ngwes/groucho-fp) — a functional pipeline library for TypeScript built on `@ngwes/mini-fp`.
 
 These skills are loaded by coding agents (Claude Code, Copilot, Cursor) when working on projects that use `groucho-fp`.
 
