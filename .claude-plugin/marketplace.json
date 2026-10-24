@@ -1,0 +1,14 @@
+{
+  "name": "groucho-fp-skills",
+  "owner": {
+    "name": "ngwes"
+  },
+  "description": "Claude Code skills for the @ngwes/groucho-fp TypeScript pipeline library",
+  "plugins": [
+    {
+      "name": "groucho-fp",
+      "source": "./",
+      "description": "Skills for @ngwes/groucho-fp — a functional pipeline library for TypeScript built on `@ngwes/mini-fp`"
+    }
+  ]
+}
