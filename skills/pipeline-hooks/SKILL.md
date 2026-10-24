@@ -13,7 +13,7 @@ A step returned `Either.left`, threw an exception, or produced a key conflict. H
 
 ```ts
 import { Either } from "@ngwes/mini-fp";
-import type { PipelineOptions } from "groucho-fp";
+import type { PipelineOptions } from "@ngwes/groucho-fp";
 
 type AppError = { code: string; detail: string };
 type Ctx = Record<string, unknown>;
@@ -83,7 +83,7 @@ Return `Either.right(ctx)` to accept the overwrite; return `Either.left` to reje
 
 ```ts
 import { Either } from "@ngwes/mini-fp";
-import type { PipelineOptions } from "groucho-fp";
+import type { PipelineOptions } from "@ngwes/groucho-fp";
 
 type AppError = { code: string; detail: string };
 type Ctx = Record<string, unknown>;

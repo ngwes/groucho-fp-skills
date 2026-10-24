@@ -8,7 +8,7 @@ description: Reference for the Step type in groucho-fp — how to write, type, a
 A step is an async function that receives the current context (frozen) and returns `Either<E, Ctx>`.
 
 ```ts
-import type { Step } from "groucho-fp";
+import type { Step } from "@ngwes/groucho-fp";
 import { Either } from "@ngwes/mini-fp";
 ```
 
@@ -36,7 +36,7 @@ return Either.right(ctx);
 ### Example
 
 ```ts
-import type { Step } from "groucho-fp";
+import type { Step } from "@ngwes/groucho-fp";
 import { Either } from "@ngwes/mini-fp";
 
 type Ctx = { input: string; parsed?: number };

@@ -8,7 +8,7 @@ description: Reference for loadSteps and loadStepsFromDir from groucho-fp — dy
 Loads steps from an explicit list of file paths, in the order provided.
 
 ```ts
-import { loadSteps } from "groucho-fp";
+import { loadSteps } from "@ngwes/groucho-fp";
 
 const steps = await loadSteps<Err, Ctx>([
   "./steps/01-validate.ts",
@@ -25,7 +25,7 @@ Steps from each file are appended in the order the paths are given.
 Scans a directory and loads all matching step files in **alphabetical order** by filename.
 
 ```ts
-import { loadStepsFromDir } from "groucho-fp";
+import { loadStepsFromDir } from "@ngwes/groucho-fp";
 
 const steps = await loadStepsFromDir<Err, Ctx>("./steps");
 

@@ -8,8 +8,8 @@ description: API reference for Pipeline from groucho-fp — signature, options, 
 Runs an ordered sequence of steps over a shared context object.
 
 ```ts
-import { Pipeline } from "groucho-fp";
-import type { PipelineOptions } from "groucho-fp";
+import { Pipeline } from "@ngwes/groucho-fp";
+import type { PipelineOptions } from "@ngwes/groucho-fp";
 
 const result = await Pipeline(initialCtx, steps, options);
 ```
@@ -59,9 +59,9 @@ interface PipelineOptions<E, Ctx extends object> {
 ### Example
 
 ```ts
-import { Pipeline } from "groucho-fp";
+import { Pipeline } from "@ngwes/groucho-fp";
 import { Either } from "@ngwes/mini-fp";
-import type { Step, PipelineOptions } from "groucho-fp";
+import type { Step, PipelineOptions } from "@ngwes/groucho-fp";
 
 type Ctx = { input: string; result?: string };
 type Err = { code: string; detail: string };

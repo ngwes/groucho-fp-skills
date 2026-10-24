@@ -8,7 +8,7 @@ description: Entry point for groucho-fp. Invoke this first when working with the
 ## Install
 
 ```bash
-npm install groucho-fp @ngwes/mini-fp
+npm install @ngwes/groucho-fp @ngwes/mini-fp
 ```
 
 ## Decision Table

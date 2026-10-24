@@ -12,9 +12,9 @@ You want to build a pipeline whose steps live in separate files, loaded at runti
 ## Recipe: full pipeline from a directory
 
 ```ts
-import { Pipeline, loadStepsFromDir } from "groucho-fp";
+import { Pipeline, loadStepsFromDir } from "@ngwes/groucho-fp";
 import { Either } from "@ngwes/mini-fp";
-import type { PipelineOptions } from "groucho-fp";
+import type { PipelineOptions } from "@ngwes/groucho-fp";
 
 type Ctx = { userId: string; profile?: Record<string, unknown> };
 type Err = { code: string; detail: string };
@@ -46,8 +46,8 @@ result.fold(
 `loadStepsFromDir` uses jiti to import TypeScript files. A syntax error in a step file causes it to throw. Wrap the load call:
 
 ```ts
-import { loadStepsFromDir } from "groucho-fp";
-import type { Step } from "groucho-fp";
+import { loadStepsFromDir } from "@ngwes/groucho-fp";
+import type { Step } from "@ngwes/groucho-fp";
 
 type Ctx = { userId: string; profile?: Record<string, unknown> };
 type Err = { code: string; detail: string };
@@ -85,7 +85,7 @@ Use `loadSteps(paths[])` when:
 - You need conditional inclusion of specific files.
 
 ```ts
-import { loadSteps } from "groucho-fp";
+import { loadSteps } from "@ngwes/groucho-fp";
 
 const steps = await loadSteps<Err, Ctx>([
   "./shared/01-auth.ts",
