@@ -2,6 +2,14 @@
   "name": "@ngwes/groucho-fp-skills",
   "version": "0.0.1",
   "description": "Claude Code skill plugin for groucho-fp",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ngwes/groucho-fp-skills.git"
+  },
+  "homepage": "https://github.com/ngwes/groucho-fp-skills#readme",
+  "bugs": {
+    "url": "https://github.com/ngwes/groucho-fp-skills/issues"
+  },
   "private": true,
   "type": "module",
   "scripts": {
