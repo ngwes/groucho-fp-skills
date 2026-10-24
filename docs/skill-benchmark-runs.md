@@ -1,6 +1,6 @@
 # Skill Benchmark Runs
 
-Cross-model evaluation log for `@ngwes/mini-fp` skills.
+Cross-model evaluation log for `@ngwes/groucho-fp` skills.
 
 Run with:
 ```bash

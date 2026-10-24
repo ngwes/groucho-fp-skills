@@ -10,9 +10,34 @@ These skills are loaded by coding agents (Claude Code, Copilot, Cursor) when wor
 
 ### Option A: Plugin
 
-```bash
-claude plugins install ngwes/groucho-fp-skills
+This repository is both a plugin and a single-plugin marketplace. In a Claude Code session:
+
+```text
+/plugin marketplace add ngwes/groucho-fp-skills
+/plugin install groucho-fp@groucho-fp-skills
 ```
+
+Or from your shell:
+
+```bash
+claude plugin marketplace add ngwes/groucho-fp-skills
+claude plugin install groucho-fp@groucho-fp-skills
+```
+
+Newer Claude Code versions can do both steps at once (2.1.275 or later in a session, 2.1.292 or later in the shell):
+
+```bash
+claude plugin install groucho-fp --marketplace ngwes/groucho-fp-skills
+```
+
+New versions reach you when you refresh the marketplace and update the plugin:
+
+```bash
+claude plugin marketplace update groucho-fp-skills
+claude plugin update groucho-fp@groucho-fp-skills
+```
+
+If the repository is private, Claude Code clones it with the git credentials already on your machine (for example after `gh auth setup-git`). Set `CLAUDE_CODE_PLUGIN_PREFER_HTTPS=1` if you have no SSH key for GitHub.
 
 ### Option B: Manual copy
 
@@ -31,6 +56,8 @@ When working with groucho-fp, invoke the `groucho-fp` skill first.
 ```
 
 The agent will load the router skill, identify the right concept or pattern, and invoke the specific skill automatically.
+
+Installed as a plugin, every skill is namespaced by the plugin name (for example `groucho-fp:groucho-fp` and `groucho-fp:pipeline`). With the manual copy they keep their plain names (`groucho-fp`, `pipeline`).
 
 ---
 
