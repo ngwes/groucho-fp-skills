@@ -5,7 +5,7 @@
       "critical": true,
       "prompt": "Write a TypeScript example using groucho-fp's Pipeline that takes a context { input: string } and runs a step that uppercases input.input into input.result. Include all required options.",
       "criteria": [
-        "The code imports Pipeline from 'groucho-fp'",
+        "The code imports Pipeline from '@ngwes/groucho-fp'",
         "The code imports Either from '@ngwes/mini-fp'",
         "The PipelineOptions object includes onLeft, onException, and onConflictingKeys hooks",
         "The step spreads ctx when returning Either.right",

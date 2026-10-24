@@ -5,7 +5,7 @@
       "critical": true,
       "prompt": "Write a complete TypeScript program using groucho-fp that loads steps from './steps' and runs a Pipeline over { userId: string }. Include options and result handling.",
       "criteria": [
-        "The code imports both Pipeline and loadStepsFromDir from 'groucho-fp'",
+        "The code imports both Pipeline and loadStepsFromDir from '@ngwes/groucho-fp'",
         "loadStepsFromDir is awaited before passing steps to Pipeline",
         "The PipelineOptions object includes onLeft, onException, and onConflictingKeys",
         "The Pipeline call is awaited",

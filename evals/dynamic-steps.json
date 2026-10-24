@@ -5,7 +5,7 @@
       "critical": true,
       "prompt": "Use groucho-fp to load all step files from the './steps' directory at runtime. Show the import and the call.",
       "criteria": [
-        "The code imports loadStepsFromDir from 'groucho-fp'",
+        "The code imports loadStepsFromDir from '@ngwes/groucho-fp'",
         "The call to loadStepsFromDir is awaited",
         "The directory path './steps' is passed as the first argument",
         "Type parameters are provided to loadStepsFromDir"
@@ -16,7 +16,7 @@
       "critical": false,
       "prompt": "Load three specific groucho-fp step files in a fixed order: ./steps/01-validate.ts, ./steps/02-fetch.ts, ./steps/03-transform.ts.",
       "criteria": [
-        "The code imports loadSteps from 'groucho-fp'",
+        "The code imports loadSteps from '@ngwes/groucho-fp'",
         "The call to loadSteps is awaited",
         "All three file paths are passed in the correct order in an array"
       ]

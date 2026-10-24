@@ -5,8 +5,8 @@
       "critical": true,
       "prompt": "Show me how to install groucho-fp and import Pipeline from it in a TypeScript project.",
       "criteria": [
-        "The response includes an npm install command for groucho-fp",
-        "The response shows an import statement from 'groucho-fp'",
+        "The response includes an npm install command for @ngwes/groucho-fp",
+        "The response shows an import statement from '@ngwes/groucho-fp'",
         "The response mentions @ngwes/mini-fp as a peer dependency"
       ]
     },

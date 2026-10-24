@@ -9,7 +9,7 @@
         "The step returns Either.right with a spread of ctx plus the new parsed field",
         "The step returns Either.left when the input is not a valid number",
         "The code imports Either from '@ngwes/mini-fp'",
-        "The code imports or uses the Step type from 'groucho-fp'"
+        "The code imports or uses the Step type from '@ngwes/groucho-fp'"
       ]
     },
     {
