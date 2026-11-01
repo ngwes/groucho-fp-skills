@@ -31,3 +31,6 @@ coverage/
 # Temporary files
 tmp/
 temp/
+
+# skill-be run outputs (only skill-be.result.json is committed)
+.skill-be/

@@ -1,0 +1,28 @@
+skills: ./skills
+evals: ./evals
+
+# The model under test and the judge. Both use the local `claude` login.
+model:
+  adapter: claude-cli
+  id: claude-sonnet-5-5
+grader:
+  adapter: claude-cli
+  id: claude-haiku-5-5
+
+reps: 3
+gradings: 3
+
+withSkillTemplate: |-
+  You have access to the following TypeScript library. Use its APIs when writing the code.
+
+  --- LIBRARY DOCS ---
+  {{skill}}
+  --- END LIBRARY DOCS ---
+
+  Task: {{task}}
+
+checks:
+  typecheck:
+    library: '@ngwes/groucho-fp'
+  coverage:
+    entry: ./node_modules/@ngwes/groucho-fp/dist/index.d.ts
