@@ -1,34 +1,39 @@
 {
+  "skill": "step-composition",
   "scenarios": [
     {
-      "id": "naming-convention",
+      "id": "split-order-function",
       "critical": true,
-      "prompt": "I'm using groucho-fp's loadStepsFromDir. How should I name my step files to control execution order?",
+      "prompt": "Using groucho-fp (with @ngwes/mini-fp), rewrite this function as a pipeline of stages. Give the context type, the error type, every stage, and the initial context built from the input.\n\n```ts\nasync function processOrder(input: { orderId: string; couponCode?: string }) {\n  const order = await db.findOrder(input.orderId);\n  if (!order) throw new Error('order not found');\n  if (order.lines.length === 0) throw new Error('empty order');\n  const subtotal = order.lines.reduce((sum, l) => sum + l.price * l.quantity, 0);\n  const discount = input.couponCode ? await coupons.discountFor(input.couponCode) : 0;\n  const total = Math.max(0, subtotal - discount);\n  await payments.charge(order.customerId, total);\n  return { orderId: input.orderId, total };\n}\n```\n\nA missing order and an empty order are expected failures, not crashes.",
       "criteria": [
-        "The response mentions numeric prefixes (e.g. 01-, 02-) in filenames",
-        "The response states that files are loaded in alphabetical order",
-        "The response provides or implies a concrete example of numbered filenames"
+        "Splits the work into separate stages for at least: loading the order, checking it is not empty, computing the amounts, and charging (not one or two stages doing everything)",
+        "All stages share one error type: a union with a discriminant field (such as tag or code) per failure, including the missing order and the empty order",
+        "Returns the missing order and the empty order as left values instead of throwing",
+        "The initial context holds only orderId and couponCode; it does not set the stages' outputs to placeholder values such as 0, null, [] or an empty order",
+        "Each stage adds its output by returning a new object spread from the context it received"
       ]
     },
     {
-      "id": "split-io-and-transform",
+      "id": "triage-folder-layout",
       "critical": false,
-      "prompt": "I have a groucho-fp step file '02-fetch-and-normalize-user.ts' that fetches a user from the DB and then normalizes the data. How should I restructure this?",
+      "prompt": "Using groucho-fp, our ticket-triage flow is loaded at runtime from the `./triage` folder, one stage per TypeScript file, run in this order: classify the ticket, detect its language, pick a team, assign an agent, notify the agent. We expect to add stages between existing ones later. All stages share one context type and one error type, and two of them use a `normalizeText(text: string): string` helper. Show the project layout with the file names, then write the 'pick a team' stage file for the context `{ ticketId: string; text: string; category?: string; language?: string; team?: string; agentId?: string }`.",
       "criteria": [
-        "The response recommends splitting into two separate files",
-        "The response separates the IO concern (fetch) from the transformation concern (normalize)",
-        "The resulting filenames or descriptions maintain the numeric ordering convention"
+        "The stage file names start with numeric prefixes that sort in the run order: classify, language, team, assign, notify",
+        "The prefixes are zero-padded or of equal width (for example 10-, 20-, 30- or 010-, 020-), so alphabetical order is the run order",
+        "Leaves gaps between the prefixes (for example 10, 20, 30) so a stage can be added between two others without renaming files",
+        "The shared types and the normalizeText helper are outside the ./triage folder, or the loader is given a pattern that matches only the stage files",
+        "The team stage file imports the shared context and error types (for example from ../types) instead of declaring its own copies"
       ]
     },
     {
-      "id": "two-well-structured-steps",
+      "id": "fix-conflicting-stages",
       "critical": false,
-      "prompt": "Write two groucho-fp step files: one that validates ctx.input is non-empty, and one that transforms ctx.input to uppercase. Use proper naming and immutability.",
+      "prompt": "Using groucho-fp, this pipeline stops with a conflict error and never produces tokens. Fix the stages so that the run completes with the trimmed, lowercased text, its tokens and the metadata. The stages run in this order, over the initial context `{ raw, meta: { source: 'api' } }`:\n\n```ts\ntype Meta = { source: string; lang?: string };\ntype Ctx = { raw: string; meta: Meta; text?: string; tokens?: string[] };\ntype Err = { tag: 'empty' } | { tag: 'crash'; cause: unknown } | { tag: 'conflict'; keys: ReadonlyArray<string> };\n\nconst clean: Step<Err, Ctx> = (ctx) => right({ ...ctx, text: ctx.raw.trim() });\nconst lower: Step<Err, Ctx> = (ctx) => right({ ...ctx, text: (ctx.text ?? '').toLowerCase() });\nconst withDefaults: Step<Err, Ctx> = (ctx) => right({ ...ctx, meta: { lang: 'en', ...ctx.meta } });\nconst tokenize: Step<Err, Ctx> = (ctx) => {\n  const { raw, ...rest } = ctx;\n  return right({ ...rest, tokens: (ctx.text ?? '').split(/\\s+/) } as Ctx);\n};\n```",
       "criteria": [
-        "There are two distinct step functions or files",
-        "The validate step returns Either.left when input is empty",
-        "The transform step spreads ctx when returning Either.right",
-        "Each step has a single responsibility"
+        "The lowercased text is no longer written over the text an earlier stage wrote: it goes to a new key, or trimming and lowercasing are done in one stage that writes text once",
+        "The tokenize stage returns a context that still has raw (it spreads ctx without removing keys)",
+        "The defaults stage no longer replaces meta with a new object: it keeps the meta reference it received, writes the defaults to a new key, or is removed",
+        "Does not fix the run by making the conflict hook accept every conflict"
       ]
     }
   ]

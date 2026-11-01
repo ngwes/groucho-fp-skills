@@ -1,38 +1,71 @@
 {
+  "skill": "pipeline",
   "scenarios": [
     {
-      "id": "basic-pipeline-usage",
+      "id": "checkout-total",
       "critical": true,
-      "prompt": "Write a TypeScript example using groucho-fp's Pipeline that takes a context { input: string } and runs a step that uppercases input.input into input.result. Include all required options.",
+      "prompt": "Using groucho-fp (with @ngwes/mini-fp), write TypeScript that computes an order total in three stages that run one after the other over a shared context: check that the cart has at least one line (otherwise fail with { code: 'EMPTY_CART' }), sum the lines (price * quantity) into a subtotal, then add 20% VAT to get the total. Write `checkout(lines: Line[]): Promise<string>` that returns 'total: <amount>' on success and 'error: <code>' on failure. An unexpected exception in a stage is a failure with code 'CRASH'.",
       "criteria": [
-        "The code imports Pipeline from '@ngwes/groucho-fp'",
-        "The code imports Either from '@ngwes/mini-fp'",
-        "The PipelineOptions object includes onLeft, onException, and onConflictingKeys hooks",
-        "The step spreads ctx when returning Either.right",
-        "The Pipeline call is awaited and the result is handled with fold or equivalent"
+        "Runs the three stages with groucho-fp's Pipeline, passing an initial context, the array of stage functions and an options object",
+        "The options object defines onException and onConflictingKeys (onLeft may be defined or left out)",
+        "The exception hook returns a left with code 'CRASH' rather than rethrowing or returning the raw exception",
+        "Produces the final string with match (or matchAsync), chained on the Pipeline call or called on the awaited result, not with try/catch, .then/.catch or an unchecked unwrapRight",
+        "Each stage adds its output by returning a new object spread from the context it received (for example { ...ctx, subtotal }), never by assigning to the context"
       ]
     },
     {
-      "id": "pipeline-options-all-hooks",
+      "id": "signup-http-response",
       "critical": true,
-      "prompt": "What are the three hooks required by PipelineOptions in groucho-fp? Show their signatures.",
+      "prompt": "Using groucho-fp, write `handleSignup(email: string): Promise<{ status: number; body: string }>`. The signup stages already exist: `signupSteps`, written for the context `{ email: string; userId?: string }` and the error type `{ message: string }`, and `signupOptions`, their hook configuration. Run the stages starting from the email. Answer 201 with the new user id on success and 400 with the error message on failure, and log failures with `logger.warn(message)` before answering.",
       "criteria": [
-        "The response mentions onLeft",
-        "The response mentions onException",
-        "The response mentions onConflictingKeys",
-        "The response shows that each hook receives the current context as a parameter",
-        "The response shows that each hook returns Promise<Either<E, Ctx>>"
+        "Runs the stages with Pipeline, passing a context built from the email, signupSteps and signupOptions",
+        "Builds the response with match (or matchAsync), chained on the Pipeline call or called on the awaited Either, not with isRight/unwrapRight branches or try/catch",
+        "Logs the failure with onLeft chained on the result, or inside the failure branch of match",
+        "Does not call .catch or .finally on the Pipeline result, and does not wrap it in new Promise or Promise.resolve to get them"
       ]
     },
     {
-      "id": "execution-model",
+      "id": "hook-configuration",
+      "critical": true,
+      "prompt": "Using groucho-fp, write the hook configuration for a pipeline over the context `{ requestId: string; payload?: Payload; saved?: boolean }` with the error type `type AppError = { tag: 'invalid'; reason: string } | { tag: 'crash'; cause: unknown } | { tag: 'conflict'; keys: ReadonlyArray<string> }`. An expected failure returned by a stage should simply stop the run with that error. A thrown exception should stop the run with a 'crash' error. A stage that overwrites a value an earlier stage wrote should stop the run with a 'conflict' error listing the keys. Keep it as short as the library allows.",
+      "criteria": [
+        "The configuration is typed as PipelineOptions<AppError, Ctx>, or written inline in a Pipeline call",
+        "Leaves onLeft out, since without it a stage's left already stops the run unchanged (an onLeft that only returns the same error does not meet this)",
+        "The exception hook returns left({ tag: 'crash', cause: <the exception> }), wrapping the thrown value instead of returning it as the left value",
+        "The conflict hook returns a left with tag 'conflict' and the keys it received",
+        "No hook is marked async, and none wraps its Either in Promise.resolve: each returns the Either directly"
+      ]
+    },
+    {
+      "id": "class-instance-context",
       "critical": false,
-      "prompt": "Explain how groucho-fp's Pipeline executes steps and what happens when a step returns Either.left.",
+      "prompt": "Using groucho-fp, we have `class ImportJob { constructor(readonly fileName: string, readonly rows: string[]) {} get rowCount() { return this.rows.length; } isEmpty() { return this.rows.length === 0; } }`. Write `runImport(job: ImportJob)` that runs two stages: reject an empty job with { reason: 'empty' }, then count the rows that are valid JSON and store that count. It resolves to the count, or to the failure reason.",
       "criteria": [
-        "The response states that steps run sequentially",
-        "The response states that the context is frozen or immutable before each step",
-        "The response states that returning Either.left stops the pipeline and triggers onLeft",
-        "The response states that subsequent steps are skipped after a left"
+        "The initial context is a plain object literal (the job's fields copied into it, or the job held in a field of it), not the ImportJob instance passed directly as the context",
+        "The stages read plain fields of the context; they do not call isEmpty() or read rowCount on the context object itself",
+        "Turns the run's outcome into the count or the reason with match or map/mapLeft on the Pipeline result, not with try/catch"
+      ]
+    },
+    {
+      "id": "enrich-lead-unawaited",
+      "critical": false,
+      "prompt": "Using groucho-fp, write `enrichLead(lead: { email: string })` that runs two stages: derive the company domain from the email (fail with { tag: 'bad-email' } when there is no '@'), then score the lead (10 for gmail.com, 50 otherwise). The function returns the enriched lead `{ email, domain, score }` or the error, without awaiting anything itself, so the caller decides how to consume it. It never throws.",
+      "criteria": [
+        "Returns the Pipeline result (an EitherAsync), optionally after map/mapLeft, without awaiting it inside enrichLead",
+        "Reads domain and score from the context the pipeline produced, not from the lead object passed in",
+        "The domain stage returns left({ tag: 'bad-email' }) for an email without '@' instead of throwing",
+        "The stages add domain and score by returning new objects spread from the context, never by assigning to the context or to lead"
+      ]
+    },
+    {
+      "id": "optional-coupon",
+      "critical": false,
+      "prompt": "Using groucho-fp, write a checkout flow with three stages over `{ cartId: string; couponCode?: string; discount?: number; total?: number }`: load the cart total, look up the coupon discount (fails with { tag: 'coupon-not-found' } when the code is unknown or missing), then compute the amount to pay. A coupon that is not found must not stop the checkout: the flow continues with a discount of 0. Any other failure stops it. Exceptions become { tag: 'crash', cause } and overwritten values { tag: 'conflict', keys }.",
+      "criteria": [
+        "Recovers from 'coupon-not-found' in onLeft by returning right of the context with discount 0, so the next stage still runs",
+        "onLeft returns left(error) for every other error",
+        "The coupon stage reports the missing coupon as a left, instead of the recovery being done with try/catch or inside the stage",
+        "The exception hook wraps the thrown value in { tag: 'crash', cause } rather than returning it as is"
       ]
     }
   ]

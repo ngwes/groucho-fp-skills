@@ -1,32 +1,48 @@
 {
+  "skill": "groucho-fp",
   "scenarios": [
     {
-      "id": "install-and-import",
+      "id": "signup-with-optional-geo",
       "critical": true,
-      "prompt": "Show me how to install groucho-fp and import Pipeline from it in a TypeScript project.",
+      "prompt": "Using groucho-fp (with @ngwes/mini-fp), write `subscribe(email: string): Promise<string>` for a newsletter sign-up. Three stages run one after the other over a shared object: (1) validate the email, failing with { tag: 'invalid-email' } when it has no '@'; (2) look up the subscriber's country with the existing `geo.lookup(email): Promise<string | undefined>`, failing with { tag: 'geo-unavailable' } when it returns nothing; (3) save the subscriber with the existing `store.save(email, country): Promise<void>`. A missing country is a normal case and must not stop the sign-up: it goes on with the country 'unknown'. Any other failure stops it. An unexpected exception in a stage is a failure { tag: 'crash', cause }, and a stage that overwrites a value an earlier stage wrote is a failure { tag: 'conflict', keys }. Resolve to 'subscribed: <country>' on success and 'error: <tag>' on failure.",
       "criteria": [
-        "The response includes an npm install command for @ngwes/groucho-fp",
-        "The response shows an import statement from '@ngwes/groucho-fp'",
-        "The response mentions @ngwes/mini-fp as a peer dependency"
+        "Runs the three stages with groucho-fp's Pipeline, passing an initial context, the array of stage functions and an options object",
+        "Recovers from 'geo-unavailable' in the failure hook (onLeft) by returning right of the context with country 'unknown', so the save stage still runs",
+        "The failure hook returns left(error) for every error other than 'geo-unavailable'",
+        "The geo stage reports the missing country as a left value, instead of the recovery being done with try/catch or inside the stage",
+        "The exception hook returns left({ tag: 'crash', cause: <the exception> }), wrapping the thrown value instead of returning it as the left value",
+        "The conflict hook returns a left with tag 'conflict' and the keys it received",
+        "Each stage adds its output by returning a new object spread from the context it received (for example { ...ctx, country }), never by assigning to the context",
+        "The initial context holds only the email, without placeholder values for the stages' outputs",
+        "Produces the final string with match (or matchAsync), chained on the Pipeline call or called on the awaited result, not with try/catch or .catch"
       ]
     },
     {
-      "id": "route-to-pipeline",
+      "id": "rules-in-files",
       "critical": false,
-      "prompt": "I'm using groucho-fp. I need to run a series of async transformations over a shared object. Which concept or API should I learn about?",
+      "prompt": "Using groucho-fp (with @ngwes/mini-fp), our pricing rules are TypeScript files in the `./rules` folder, loaded at runtime with no build step, so that operators can add rules without a redeploy. They run in file-name order over the context `type Ctx = { orderId: string; subtotal: number; total?: number }` with the error type `type PricingError = { tag: string }`. Write (1) the file `./rules/10-vat.ts`, a rule that adds 20% VAT to the subtotal and stores it as the total, and fails with { tag: 'empty-order' } when the subtotal is 0 or less; and (2) `price(orderId: string, subtotal: number): Promise<string>`, which loads the rules and runs them with the existing `pricingOptions` hook configuration. It resolves to 'total: <amount>' on success, 'error: <tag>' when a rule fails, and 'load failed: <number of files>' when any file of the folder cannot be loaded (in that case no rule runs).",
       "criteria": [
-        "The response mentions Pipeline",
-        "The response mentions Step functions",
-        "The response does not suggest using plain Promise chains or other non-groucho-fp patterns as the primary approach"
+        "The rule file exports its step as the default export (or as a named `steps` export)",
+        "The rule stores the total by returning a new object spread from the context it received, never by assigning to the context",
+        "The rule returns left({ tag: 'empty-order' }) for a subtotal of 0 or less instead of throwing",
+        "Loads the folder with groucho-fp's loadStepsFromDir('./rules') (or loadSteps with the list of file paths)",
+        "Does not run the pipeline when loading failed: Pipeline is called inside bindAsync on the load result, or only in the success branch of match or of an isRight/isLeft check",
+        "Produces 'load failed: <count>' from the length of the load errors array",
+        "Handles the load failure as a value (mapLeft, match or an isLeft check), not with try/catch around the loader"
       ]
     },
     {
-      "id": "route-to-dynamic-loading",
+      "id": "report-unawaited",
       "critical": false,
-      "prompt": "I'm using groucho-fp. I want to load my step functions from separate files on disk at runtime. What should I look into?",
+      "prompt": "Using groucho-fp (with @ngwes/mini-fp), write `buildReport(reportId: string)` for a reporting service. Two stages run one after the other over a shared object: fetch the report's rows with the existing `db.fetchRows(reportId): Promise<Row[]>` (which rejects when the database is down), then count the rows by `row.kind` into a summary, failing with { tag: 'empty-report' } when there are no rows. Any rejection from a stage must stop the run with { tag: 'crash', cause }, and an overwritten value with { tag: 'conflict', keys }. The function returns the result without awaiting anything itself, because the HTTP layer decides how to consume it. The result holds the summary, or the error. It never rejects because of a stage.",
       "criteria": [
-        "The response mentions loadStepsFromDir or loadSteps",
-        "The response does not suggest only static imports as the solution"
+        "Runs the stages with groucho-fp's Pipeline, passing an initial context, the array of stage functions and an options object",
+        "The initial context holds only the reportId, without placeholder values such as [] or {} for the rows and the summary",
+        "The counting stage returns left({ tag: 'empty-report' }) for no rows instead of throwing",
+        "The exception hook returns left({ tag: 'crash', cause: <the exception> }), wrapping the thrown value instead of returning it as the left value",
+        "The conflict hook returns a left with tag 'conflict' and the keys it received",
+        "Returns the Pipeline result (an EitherAsync), optionally after map/mapLeft, without awaiting it inside buildReport",
+        "Reads the summary from the context the pipeline produced, not from the object passed to Pipeline"
       ]
     }
   ]

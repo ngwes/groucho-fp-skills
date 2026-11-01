@@ -1,35 +1,65 @@
 {
+  "skill": "step",
   "scenarios": [
     {
-      "id": "write-step-parse",
+      "id": "parse-quantity",
       "critical": true,
-      "prompt": "Write a groucho-fp Step function that reads ctx.input (a string), parses it as an integer, and returns ctx with ctx.parsed set. Return Either.left if the input is not a valid number.",
+      "prompt": "Using groucho-fp, write the pipeline stage that parses `ctx.rawQuantity` (a string) into an integer `quantity`, for the context `{ rawQuantity: string; quantity?: number }`. It fails with `{ tag: 'invalid-quantity'; raw: string }` when the value is not a positive integer.",
       "criteria": [
-        "The step function is async",
-        "The step returns Either.right with a spread of ctx plus the new parsed field",
-        "The step returns Either.left when the input is not a valid number",
-        "The code imports Either from '@ngwes/mini-fp'",
-        "The code imports or uses the Step type from '@ngwes/groucho-fp'"
+        "The stage is typed as groucho-fp's Step<Err, Ctx>, or as a function from Readonly<Ctx> to an Either of the error and the context",
+        "On success it returns right (or Either.right) of a new object spread from ctx with quantity added",
+        "For invalid input it returns a left with tag 'invalid-quantity' and the raw value, instead of throwing",
+        "The stage is not marked async: it does no async work and returns the Either directly"
       ]
     },
     {
-      "id": "frozen-context-immutability",
+      "id": "parse-json-config",
       "critical": true,
-      "prompt": "Write a groucho-fp step that adds a 'validated: true' field to the context. Show the correct immutable pattern.",
+      "prompt": "Using groucho-fp, write the pipeline stage that parses `ctx.rawConfig` (a JSON string) into `config`, for the context `{ rawConfig: string; config?: Config }`. Malformed JSON must become the failure `{ tag: 'bad-config'; detail: string }` (with the parser's message as detail) rather than crash the run.",
       "criteria": [
-        "The step uses spread syntax to create a new context object (e.g. { ...ctx, validated: true })",
-        "The step does not directly assign to ctx properties (no ctx.validated = ...)",
-        "The step returns Either.right with the new context"
+        "Converts the exception thrown by JSON.parse with Try.run(...) and toEither()/match (with mapLeft or an equivalent to build the bad-config error), not with a try/catch block",
+        "The failure is returned as a left with tag 'bad-config', not thrown out of the stage",
+        "Adds config by returning a new object spread from ctx"
       ]
     },
     {
-      "id": "step-throws-vs-left",
+      "id": "user-lookup",
+      "critical": true,
+      "prompt": "Using groucho-fp, write the pipeline stage that finds the user for `ctx.userId` in `users: Map<string, User>` and stores it as `user`, for the context `{ userId: string; user?: User }`. When there is no such user it fails with `{ tag: 'user-not-found'; userId: string }`.",
+      "criteria": [
+        "Turns the possibly undefined lookup into an Either with toEither(...), Option.from(...).toEither(...) or an equivalent mini-fp conversion, not with an if or a null/undefined check",
+        "Adds the user by mapping it into a new object spread from ctx (for example .map((user) => ({ ...ctx, user })))",
+        "The not-found error carries the userId"
+      ]
+    },
+    {
+      "id": "fetch-orders",
       "critical": false,
-      "prompt": "In groucho-fp, what is the difference between a step returning Either.left and a step throwing an exception? Which hook handles each case?",
+      "prompt": "Using groucho-fp, write the pipeline stage that loads the customer's orders with `api.fetchOrders(customerId: string): Promise<Order[]>` (the promise may reject on network errors) and stores them as `orders`, for the context `{ customerId: string; orders?: Order[] }`. A network failure must become the failure `{ tag: 'upstream'; cause: unknown }` instead of an exception.",
       "criteria": [
-        "The response states that Either.left triggers onLeft",
-        "The response states that a thrown exception triggers onException",
-        "The response distinguishes the two cases clearly"
+        "Turns the rejection into the upstream error as a value with a mini-fp chain (TryAsync.runAsync(...).toEither().mapLeft(...), or an equivalent such as bindAsync/mapLeft), not with try/catch around await",
+        "Adds the orders by returning a new object spread from ctx",
+        "Returns an Either, a promise of one or an EitherAsync, not the bare orders array or a context without an Either"
+      ]
+    },
+    {
+      "id": "image-context-type",
+      "critical": false,
+      "prompt": "Using groucho-fp, define the context type and the initial context for a pipeline that processes an uploaded image. The caller gives `fileName` and `bytes` (a Uint8Array); later stages write `width`, `height`, `thumbnail` (a Uint8Array) and `tags` (string[]). Write the type, a function that builds the initial context from an upload, and the stage that writes `tags` by splitting the file name (without extension) on '-'.",
+      "criteria": [
+        "Declares width, height, thumbnail and tags as optional fields of the context type (with ?:)",
+        "The initial context holds only fileName and bytes; it does not set the stage outputs to defaults such as 0, [], '' or null",
+        "The tags stage returns a new object spread from ctx with tags added"
+      ]
+    },
+    {
+      "id": "audit-passthrough",
+      "critical": false,
+      "prompt": "Using groucho-fp, write a pipeline stage for the context `{ orderId: string; total?: number }` that only records `ctx.orderId` with `audit.log(orderId)` (synchronous, returns void) and lets the run continue without changing the context.",
+      "criteria": [
+        "Returns right(ctx) (or Either.right(ctx)) with the context it received, not right(undefined), right() or right of audit.log's return value",
+        "The stage is not marked async",
+        "Does not assign to ctx or return a context with fields removed"
       ]
     }
   ]

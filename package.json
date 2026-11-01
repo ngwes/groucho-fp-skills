@@ -13,18 +13,25 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "prepare": "husky"
+    "prepare": "husky",
+    "bench": "skill-be run",
+    "bench:check": "skill-be check",
+    "bench:verify": "skill-be verify"
   },
   "devDependencies": {
     "@commitlint/cli": "^20.5.0",
     "@commitlint/config-conventional": "^20.5.0",
+    "@ngwes/groucho-fp": "^2.0.0",
+    "@ngwes/mini-fp": "^2.0.0",
+    "@ngwes/skill-be": "^1.0.2",
     "@semantic-release/changelog": "^6.0.3",
     "@semantic-release/exec": "^6.0.3",
     "@semantic-release/git": "^10.0.1",
     "husky": "^9.1.7",
-    "semantic-release": "^25.0.3"
+    "semantic-release": "^25.0.3",
+    "typescript": "^6.0.3"
   },
   "engines": {
-    "node": ">=18"
+    "node": ">=20"
   }
 }

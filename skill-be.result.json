@@ -1,0 +1,75 @@
+{
+  "skillBeVersion": "1.0.2",
+  "skills": {
+    "dynamic-loading": {
+      "date": "2026-11-01",
+      "fingerprint": "adc2e84a11e20d9031bb6ba08367ad48001e5a241aef020bd8507160d49b09bc",
+      "ready": true,
+      "reasons": [],
+      "models": [
+        "claude-sonnet-5-5"
+      ],
+      "grader": "claude-haiku-5-5"
+    },
+    "dynamic-steps": {
+      "date": "2026-11-01",
+      "fingerprint": "98bd0e5c3eaa2392cce70f1a1d12f2e7b8285aad83670f110e40950c996d63ec",
+      "ready": true,
+      "reasons": [],
+      "models": [
+        "claude-sonnet-5-5"
+      ],
+      "grader": "claude-haiku-5-5"
+    },
+    "groucho-fp": {
+      "date": "2026-11-01",
+      "fingerprint": "ad990eedd076b09604699ec26ac312131265abbcdbf0fd1e72c8db5c63180722",
+      "ready": true,
+      "reasons": [],
+      "models": [
+        "claude-sonnet-5-5"
+      ],
+      "grader": "claude-haiku-5-5"
+    },
+    "pipeline": {
+      "date": "2026-11-01",
+      "fingerprint": "e13a481189642ab8a9677e4d5b38f35b481c71b531baff1671c4e03ec7b40255",
+      "ready": true,
+      "reasons": [],
+      "models": [
+        "claude-sonnet-5-5"
+      ],
+      "grader": "claude-haiku-5-5"
+    },
+    "pipeline-hooks": {
+      "date": "2026-11-01",
+      "fingerprint": "7c1a59e3613b092cd1391ec417e46d552a21e137c7c08f421827fb883d95569f",
+      "ready": true,
+      "reasons": [],
+      "models": [
+        "claude-sonnet-5-5"
+      ],
+      "grader": "claude-haiku-5-5"
+    },
+    "step": {
+      "date": "2026-11-01",
+      "fingerprint": "fb1b3ef0ec85fafd02382de3086373cb04da834bbb7fe696a66d26c3b0fceb74",
+      "ready": true,
+      "reasons": [],
+      "models": [
+        "claude-sonnet-5-5"
+      ],
+      "grader": "claude-haiku-5-5"
+    },
+    "step-composition": {
+      "date": "2026-11-01",
+      "fingerprint": "4ef48c31d45a3135c90bf5b3f46dd48a1985b06176af4d31a0d8a20ae8c96cfc",
+      "ready": true,
+      "reasons": [],
+      "models": [
+        "claude-sonnet-5-5"
+      ],
+      "grader": "claude-haiku-5-5"
+    }
+  }
+}

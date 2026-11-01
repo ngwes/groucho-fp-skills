@@ -1,46 +1,38 @@
 {
+  "skill": "pipeline-hooks",
   "scenarios": [
     {
-      "id": "minimal-options-object",
+      "id": "rollback-or-continue",
       "critical": true,
-      "prompt": "Write a complete PipelineOptions object for groucho-fp with all three required hooks. Use AppError = { code: string; detail: string } as the error type.",
+      "prompt": "Using groucho-fp (with @ngwes/mini-fp 2), write the hook configuration for an order-saving flow over `{ orderId: string; tx?: Tx; saved?: boolean; receiptSent?: boolean }`, where `type Tx = { commit(): Promise<void>; rollback(): Promise<void> }`, with the error type `type SaveError = { tag: 'invalid-order'; reason: string } | { tag: 'receipt-failed' } | { tag: 'crash'; cause: unknown } | { tag: 'conflict'; keys: ReadonlyArray<string> } | { tag: 'rollback-failed'; cause: unknown }`. The first stage opens a database transaction and stores it as `tx`; the next stages validate and write the order; then a stage emails the receipt and fails with { tag: 'receipt-failed' } when the mail server refuses it; the last stage commits. A refused receipt must not cancel the order: the flow goes on to the commit. Any other failure, a thrown exception (as { tag: 'crash', cause }) or a stage overwriting a value an earlier stage wrote (as { tag: 'conflict', keys }) must roll the transaction back and stop with that error. The rollback itself can fail: the flow must then end with { tag: 'rollback-failed', cause }, never with a rejected promise.",
       "criteria": [
-        "The options object includes onLeft",
-        "The options object includes onException",
-        "The options object includes onConflictingKeys",
-        "onLeft returns Either.left",
-        "onException returns Either.left",
-        "onConflictingKeys returns Either.left"
+        "On 'receipt-failed', the failure hook (onLeft) returns right of the context it received (right(ctx), or a spread of it), so the commit stage still runs",
+        "For every other error, the failure hook rolls the transaction back before returning a left",
+        "The exception hook rolls the transaction back before returning a left with tag 'crash' that holds the thrown value as cause",
+        "The conflict hook rolls the transaction back before returning a left with tag 'conflict' and the keys",
+        "A failing rollback is turned into left({ tag: 'rollback-failed', cause }) inside the hooks (TryAsync, Try, or a catch inside the hook), so no hook throws or rejects"
       ]
     },
     {
-      "id": "onLeft-propagate-and-log",
+      "id": "readable-crash-message",
       "critical": false,
-      "prompt": "Write an onLeft hook for a groucho-fp PipelineOptions that logs the error to the console and then propagates it.",
+      "prompt": "Using groucho-fp with @ngwes/mini-fp 2, write the hook configuration for an import flow over `{ fileName: string; rows?: string[]; imported?: number }` with the error type `type ImportError = { tag: 'crash'; message: string; cause: unknown } | { tag: 'conflict'; keys: ReadonlyArray<string> } | { tag: 'invalid-row'; line: number }`. The stages call third-party parsers that may throw anything: Error objects, plain strings, or nothing at all (`throw undefined`, `Promise.reject()`). A thrown value must stop the run with a 'crash' error whose message is readable in every one of those cases. An overwritten value stops the run with a 'conflict' error.",
       "criteria": [
-        "The hook accepts err and ctx parameters",
-        "The hook logs the error (e.g. console.error or console.log)",
-        "The hook returns Either.left(err)"
+        "The exception hook returns left of a { tag: 'crash', ... } object, never left(exception) or left of the raw thrown value",
+        "Builds message with an instanceof Error check (or an equivalent type guard) and a String(...) or fixed-text fallback for other values, not with an unchecked (exception as Error).message",
+        "Keeps the thrown value in the error's cause field",
+        "The exception hook does not rethrow, so a thrown value ends as a left result"
       ]
     },
     {
-      "id": "onLeft-recovery",
+      "id": "accept-timestamp-rewrite",
       "critical": false,
-      "prompt": "Write an onLeft hook for groucho-fp that recovers from the error by returning a default context instead of propagating the failure.",
+      "prompt": "Using groucho-fp, a document flow over `{ docId: string; markdown?: string; html?: string; lastModified?: Date }` has stages that each set `lastModified` to the current time after doing their work, so a later stage replaces the date an earlier one wrote. That rewrite is expected: the run must go on with the stage's new date. Any other overwrite of a value an earlier stage wrote is a bug and must stop the run with { tag: 'conflict', keys }. Exceptions become { tag: 'crash', cause }. Write the hook configuration.",
       "criteria": [
-        "The hook returns Either.right with a context object",
-        "The hook does not return Either.left",
-        "The code imports Either from '@ngwes/mini-fp'"
-      ]
-    },
-    {
-      "id": "onException-wrap",
-      "critical": true,
-      "prompt": "Write an onException hook for groucho-fp that wraps the thrown value into a structured error { code: 'EXCEPTION', detail: string }.",
-      "criteria": [
-        "The hook accepts the exception as its first parameter",
-        "The hook returns Either.left with code 'EXCEPTION'",
-        "The detail field is derived from the exception (e.g. String(ex) or ex.message)"
+        "When lastModified is the only conflicting key, the conflict hook returns right of the context the stage returned (its third argument, for example right(next)), not right of the context the stage received",
+        "The conflict hook returns left({ tag: 'conflict', keys }) when any key other than lastModified conflicts",
+        "The decision is made from the keys the hook receives (for example keys.every((key) => key === 'lastModified')), not by accepting every conflict",
+        "Does not avoid the conflict by changing the stages or the context type (for example removing lastModified or making it a new key per stage)"
       ]
     }
   ]
