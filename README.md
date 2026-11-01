@@ -1,6 +1,6 @@
 # groucho-fp-skills
 
-Claude Code skill plugin for [`@ngwes/groucho-fp`](https://www.npmjs.com/package/@ngwes/groucho-fp) — a functional pipeline library for TypeScript built on `@ngwes/mini-fp`.
+Claude Code skill plugin for [`@ngwes/groucho-fp`](https://www.npmjs.com/package/@ngwes/groucho-fp) — a functional pipeline library for TypeScript built on `@ngwes/mini-fp`. The skills teach `@ngwes/groucho-fp` 2 with `@ngwes/mini-fp` 2.
 
 These skills are loaded by coding agents (Claude Code, Copilot, Cursor) when working on projects that use `groucho-fp`.
 
@@ -106,10 +106,10 @@ npm run bench:verify         # what CI runs; no model call
 
 | Skill | Description |
 |---|---|
-| `groucho-fp` | Router — entry point, decision table, skill index |
-| `pipeline` | `Pipeline` API reference |
-| `step` | `Step<E, Ctx>` type reference |
-| `dynamic-steps` | `loadSteps` and `loadStepsFromDir` reference |
-| `pipeline-hooks` | Pattern: handling `onLeft`, `onException`, `onConflictingKeys` |
-| `step-composition` | Pattern: ordering, naming conventions, immutability |
-| `dynamic-loading` | Pattern: assembling pipelines from the filesystem |
+| `groucho-fp` | Router — entry point, decision table, core signatures, skill index |
+| `pipeline` | `Pipeline` reference: signature, the `EitherAsync` result, execution model, options, context rules |
+| `step` | `Step` and `StepResult` reference, with the mini-fp idioms to use inside a step |
+| `dynamic-steps` | `loadSteps` and `loadStepsFromDir` reference: step file shapes and `LoadError` |
+| `pipeline-hooks` | Pattern: recovering with a default in `onLeft`, wrapping exceptions in `onException`, accepting or rejecting overwrites in `onConflictingKeys`, cleanup |
+| `step-composition` | Pattern: small steps sharing one context and one error union, run order, never overwriting an earlier key |
+| `dynamic-loading` | Pattern: load then run as one `EitherAsync`, load once at startup, mix app steps with loaded ones |
