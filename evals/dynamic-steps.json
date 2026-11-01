@@ -4,12 +4,11 @@
     {
       "id": "load-folder-with-messages",
       "critical": true,
-      "prompt": "Using groucho-fp, write `loadStages()` that loads, at runtime, every stage file in the `./stages` directory (TypeScript files, no build step). It resolves to the stages, or, when files cannot be loaded, to a list of human-readable messages, one per failing file, saying which file failed and why (missing, broken import, or nothing usable exported). It must not throw.",
+      "prompt": "Using groucho-fp, write `loadStages()` that loads, at runtime, every stage file in the `./stages` directory (TypeScript files, no build step). It resolves to the stages, or, when files cannot be loaded, to a list of human-readable messages, one per failing file, saying which file failed and the reason. It must not throw.",
       "criteria": [
         "Loads the directory with groucho-fp's loadStepsFromDir('./stages')",
         "Treats the loader's result as an Either of load errors or steps (match, map, mapLeft or bindAsync on it), not as an array of steps",
         "Builds each message from the error's tag (a switch on tag, or a lookup/match over 'not-found', 'import-failed' and 'invalid-export')",
-        "Uses the error's detail field for 'invalid-export' and its cause for 'not-found'/'import-failed'",
         "Does not use try/catch to detect load failures"
       ]
     },
