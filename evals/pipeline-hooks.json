@@ -1,46 +1,37 @@
 {
+  "skill": "pipeline-hooks",
   "scenarios": [
     {
-      "id": "minimal-options-object",
+      "id": "weather-default-city",
       "critical": true,
-      "prompt": "Write a complete PipelineOptions object for groucho-fp with all three required hooks. Use AppError = { code: string; detail: string } as the error type.",
+      "prompt": "Using groucho-fp (with @ngwes/mini-fp), write a weather widget flow with three stages that run one after the other over `{ ip: string; city?: string; forecast?: Forecast; html?: string }`: locate the city with `geo.cityOf(ip): Promise<string | undefined>` (fails with { tag: 'unknown-location' } when there is none), fetch the forecast with `weather.forecastFor(city): Promise<Forecast | undefined>` (fails with { tag: 'no-forecast' }), then render the HTML. An unknown location must not fail the widget: the flow goes on with the city 'Paris' and still fetches and renders its forecast. Any other failure stops the flow. Exceptions become { tag: 'crash', cause } and overwritten values { tag: 'conflict', keys }. Write `widget(ip: string): Promise<string>` that returns the HTML or 'error: <tag>'.",
       "criteria": [
-        "The options object includes onLeft",
-        "The options object includes onException",
-        "The options object includes onConflictingKeys",
-        "onLeft returns Either.left",
-        "onException returns Either.left",
-        "onConflictingKeys returns Either.left"
+        "Handles 'unknown-location' in the failure hook (onLeft) by returning right (or Either.right) of a context with city set to 'Paris'",
+        "The recovered context is spread from the context the hook received (for example { ...ctx, city: 'Paris' }), not a new object that drops ip",
+        "The failure hook returns left(error) for every error other than 'unknown-location'",
+        "The locate stage returns the 'unknown-location' failure as a left; the 'Paris' default is not applied inside that stage or with try/catch"
       ]
     },
     {
-      "id": "onLeft-propagate-and-log",
+      "id": "readable-crash-message",
       "critical": false,
-      "prompt": "Write an onLeft hook for a groucho-fp PipelineOptions that logs the error to the console and then propagates it.",
+      "prompt": "Using groucho-fp with @ngwes/mini-fp 2, write the hook configuration for an import flow over `{ fileName: string; rows?: string[]; imported?: number }` with the error type `type ImportError = { tag: 'crash'; message: string; cause: unknown } | { tag: 'conflict'; keys: ReadonlyArray<string> } | { tag: 'invalid-row'; line: number }`. The stages call third-party parsers that may throw anything: Error objects, plain strings, or nothing at all (`throw undefined`, `Promise.reject()`). A thrown value must stop the run with a 'crash' error whose message is readable in every one of those cases. An overwritten value stops the run with a 'conflict' error.",
       "criteria": [
-        "The hook accepts err and ctx parameters",
-        "The hook logs the error (e.g. console.error or console.log)",
-        "The hook returns Either.left(err)"
+        "The exception hook returns left of a { tag: 'crash', ... } object, never left(exception) or left of the raw thrown value",
+        "Builds message with an instanceof Error check (or an equivalent type guard) and a String(...) or fixed-text fallback for other values, not with an unchecked (exception as Error).message",
+        "Keeps the thrown value in the error's cause field",
+        "The exception hook does not rethrow, so a thrown value ends as a left result"
       ]
     },
     {
-      "id": "onLeft-recovery",
+      "id": "accept-timestamp-rewrite",
       "critical": false,
-      "prompt": "Write an onLeft hook for groucho-fp that recovers from the error by returning a default context instead of propagating the failure.",
+      "prompt": "Using groucho-fp, a document flow over `{ docId: string; markdown?: string; html?: string; lastModified?: Date }` has stages that each set `lastModified` to the current time after doing their work, so a later stage replaces the date an earlier one wrote. That rewrite is expected: the run must go on with the stage's new date. Any other overwrite of a value an earlier stage wrote is a bug and must stop the run with { tag: 'conflict', keys }. Exceptions become { tag: 'crash', cause }. Write the hook configuration.",
       "criteria": [
-        "The hook returns Either.right with a context object",
-        "The hook does not return Either.left",
-        "The code imports Either from '@ngwes/mini-fp'"
-      ]
-    },
-    {
-      "id": "onException-wrap",
-      "critical": true,
-      "prompt": "Write an onException hook for groucho-fp that wraps the thrown value into a structured error { code: 'EXCEPTION', detail: string }.",
-      "criteria": [
-        "The hook accepts the exception as its first parameter",
-        "The hook returns Either.left with code 'EXCEPTION'",
-        "The detail field is derived from the exception (e.g. String(ex) or ex.message)"
+        "When lastModified is the only conflicting key, the conflict hook returns right of the context the stage returned (its third argument, for example right(next)), not right of the context the stage received",
+        "The conflict hook returns left({ tag: 'conflict', keys }) when any key other than lastModified conflicts",
+        "The decision is made from the keys the hook receives (for example keys.every((key) => key === 'lastModified')), not by accepting every conflict",
+        "Does not avoid the conflict by changing the stages or the context type (for example removing lastModified or making it a new key per stage)"
       ]
     }
   ]
