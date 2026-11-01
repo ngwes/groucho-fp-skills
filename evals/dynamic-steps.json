@@ -1,43 +1,59 @@
 {
+  "skill": "dynamic-steps",
   "scenarios": [
     {
-      "id": "loadStepsFromDir-basic",
+      "id": "load-folder-with-messages",
       "critical": true,
-      "prompt": "Use groucho-fp to load all step files from the './steps' directory at runtime. Show the import and the call.",
+      "prompt": "Using groucho-fp, write `loadStages()` that loads, at runtime, every stage file in the `./stages` directory (TypeScript files, no build step). It resolves to the stages, or, when files cannot be loaded, to a list of human-readable messages, one per failing file, saying which file failed and why (missing, broken import, or nothing usable exported). It must not throw.",
       "criteria": [
-        "The code imports loadStepsFromDir from '@ngwes/groucho-fp'",
-        "The call to loadStepsFromDir is awaited",
-        "The directory path './steps' is passed as the first argument",
-        "Type parameters are provided to loadStepsFromDir"
+        "Loads the directory with groucho-fp's loadStepsFromDir('./stages')",
+        "Treats the loader's result as an Either of load errors or steps (match, map, mapLeft or bindAsync on it), not as an array of steps",
+        "Builds each message from the error's tag (a switch on tag, or a lookup/match over 'not-found', 'import-failed' and 'invalid-export')",
+        "Uses the error's detail field for 'invalid-export' and its cause for 'not-found'/'import-failed'",
+        "Does not use try/catch to detect load failures"
       ]
     },
     {
-      "id": "loadSteps-explicit-order",
-      "critical": false,
-      "prompt": "Load three specific groucho-fp step files in a fixed order: ./steps/01-validate.ts, ./steps/02-fetch.ts, ./steps/03-transform.ts.",
+      "id": "fixed-order-plugins",
+      "critical": true,
+      "prompt": "Using groucho-fp, load the stages from exactly these files, in this order: ./plugins/auth.ts, ./plugins/rate-limit.ts, ./plugins/handler.ts. Then run them over `{ request }` with the existing `options`. Write `serve(request: Request): Promise<{ status: number; body: string }>`: 500 with the number of files that failed to load, 400 with the error message when a stage fails, 200 with the context's `response` field otherwise.",
       "criteria": [
-        "The code imports loadSteps from '@ngwes/groucho-fp'",
-        "The call to loadSteps is awaited",
-        "All three file paths are passed in the correct order in an array"
+        "Loads the files with loadSteps, passing the three paths in that order in one array",
+        "Does not pass the loader's result straight to Pipeline as if it were the steps array",
+        "Runs Pipeline only when loading succeeded (bindAsync on the load result, or inside its right/success branch)",
+        "Handles a load failure as a value (match, mapLeft, or a switch on tag), not with try/catch"
       ]
     },
     {
-      "id": "step-file-export-formats",
+      "id": "stage-file-shapes",
       "critical": false,
-      "prompt": "Show the three ways a groucho-fp step file can export its steps so that loadStepsFromDir picks them up.",
+      "prompt": "Using groucho-fp, write three stage files for a folder that is loaded at runtime, for the context `{ text: string; trimmed?: string; lower?: string; upper?: string; words?: number }`. `01-trim.ts` contributes one stage that writes `trimmed`. `02-case.ts` contributes two stages, one writing `lower` and one writing `upper`. `03-meta.ts` already has a default export that other code imports, `export default { name: 'meta' }`, which must stay; it must also contribute one stage that writes `words`.",
       "criteria": [
-        "The response shows a default export of a single function",
-        "The response shows a default export of an array of functions",
-        "The response shows a named export called 'steps'"
+        "01-trim.ts default-exports its single stage function (or exports it in a one-element array as default or as `steps`)",
+        "02-case.ts exports its two stages as an array, as the default export or as a named `steps` export",
+        "03-meta.ts keeps its default export and contributes its stage through a named `steps` export holding an array",
+        "Each stage returns a new object spread from ctx"
       ]
     },
     {
-      "id": "pattern-filter-option",
+      "id": "only-stage-files",
       "critical": false,
-      "prompt": "Load steps from './steps' using groucho-fp, but only include files ending in .step.ts or .step.js.",
+      "prompt": "Using groucho-fp, the `./workflow` folder contains stage files named like `10-fetch.stage.ts` and `20-save.stage.ts`, next to helper modules (`http.ts`, `types.ts`) and tests (`10-fetch.stage.test.ts`). Load only the stage files, in file-name order, and return the stages or the load errors.",
       "criteria": [
-        "The code uses the pattern option on loadStepsFromDir",
-        "The pattern value is a regular expression matching .step.ts and .step.js files"
+        "Passes a pattern option to loadStepsFromDir that matches only the .stage.ts files (for example /\\.stage\\.ts$/)",
+        "The pattern does not match 10-fetch.stage.test.ts, http.ts or types.ts",
+        "Lets the loader read and order the folder: no fs.readdir, manual sort or per-file import",
+        "Returns the loader's result as an Either/EitherAsync of errors or steps, not an array that drops the errors"
+      ]
+    },
+    {
+      "id": "report-absolute-paths",
+      "critical": false,
+      "prompt": "Using groucho-fp, load the stages in `./steps` at runtime. The folder also holds a unit test next to each stage (`01-parse.test.ts`) and generated declaration files (`01-parse.d.ts`); neither may be loaded. If loading fails, print one line per failing file with `console.error`, as `<full path of the file>: <reason>`, and exit with `process.exit(1)`; otherwise return the stages.",
+      "criteria": [
+        "Calls loadStepsFromDir('./steps') with no custom pattern, or with one that still excludes .test.ts and .d.ts files",
+        "Prints the error's path as it is, without path.resolve/path.join with the folder (the path is already absolute)",
+        "Handles the failure with match, mapLeft or onLeft on the loader result (or a check of the awaited Either), not with try/catch"
       ]
     }
   ]
