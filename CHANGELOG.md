@@ -1,3 +1,17 @@
+# [1.3.0](https://github.com/ngwes/groucho-fp-skills/compare/v1.2.0...v1.3.0) (2026-11-01)
+
+
+### Bug Fixes
+
+* **skills:** keep the composition example truthful and the hook and loading evals code-graded ([590a9b6](https://github.com/ngwes/groucho-fp-skills/commit/590a9b6dd743792973da00ad64b60c7a678c65e0))
+
+
+### Features
+
+* route to the groucho-fp 2 skills ([88fb8b3](https://github.com/ngwes/groucho-fp-skills/commit/88fb8b3b3d572513494aa2f0022af105f3388e7e))
+* teach groucho-fp 2 hook recovery, step composition and loading patterns ([93430f6](https://github.com/ngwes/groucho-fp-skills/commit/93430f682f806b24e2d19165a8380e6dc512cc10))
+* teach the groucho-fp 2 pipeline, step and loader apis ([8f4137c](https://github.com/ngwes/groucho-fp-skills/commit/8f4137c564fd232e9503022479d06b6d9be3eb61))
+
 # [1.2.0](https://github.com/ngwes/groucho-fp-skills/compare/v1.1.0...v1.2.0) (2026-10-24)
 
 
