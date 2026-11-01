@@ -84,14 +84,13 @@ orders/
     40-charge.test.ts      ← skipped by the default pattern
 ```
 
-A step file imports the shared types; it does not declare its own copy:
+A step file imports the shared types (`OrderCtx` and `OrderErr` from the first example, moved to `orders/types.ts`); it does not declare its own copy:
 
-```ts
+```ts skip
 // orders/steps/20-check-not-empty.ts
-// in the project: import type { OrderCtx, OrderErr } from "../types";
-type Order = { id: string; lines: ReadonlyArray<{ price: number; quantity: number }> };
-type OrderCtx = { orderId: string; order?: Order; total?: number };
-type OrderErr = { tag: "empty-order"; orderId: string } | { tag: "order-not-found"; orderId: string };
+import type { Step } from "@ngwes/groucho-fp";
+import { left, right } from "@ngwes/mini-fp";
+import type { OrderCtx, OrderErr } from "../types";
 
 const checkNotEmpty: Step<OrderErr, OrderCtx> = (ctx) =>
   (ctx.order?.lines.length ?? 0) > 0 ? right(ctx) : left({ tag: "empty-order", orderId: ctx.orderId });

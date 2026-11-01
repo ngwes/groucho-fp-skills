@@ -28,13 +28,13 @@
     {
       "id": "external-plugin-folder",
       "critical": false,
-      "prompt": "Using groucho-fp, our app lives in /srv/app and, at startup, loads customer-provided stage files (TypeScript, no build step) from /opt/acme-plugins, outside the app. One stage file imports the npm package `date-fns`, and the plugin authors use `right` and `left` from @ngwes/mini-fp in their files. Write the loading code, which prints one line per file that cannot be loaded (its path and the reason) and refuses to start. Then tell the plugin authors how to set up /opt/acme-plugins so the imports work, how a missing date-fns would show up, and how to catch type errors in their files before deploying.",
+      "prompt": "Using groucho-fp, our app in /srv/app (with @ngwes/groucho-fp 2 and @ngwes/mini-fp 2 installed there) loads customer-provided stage files, TypeScript with no build step, from /opt/acme-plugins, a folder outside the app. The stage files import the npm package `date-fns` and use `right` and `left` from @ngwes/mini-fp. Write: (1) the app's startup code that loads the stages from that folder, refuses to start when any file cannot be loaded, and prints one line per failing file, with a dedicated message when the file could not be imported (for example because a package it imports is missing); (2) the files to add to /opt/acme-plugins so the stage files' imports work there; (3) the type-check command the plugin authors run in CI before deploying.",
       "criteria": [
-        "Says /opt/acme-plugins (or a parent folder of it) needs its own node_modules with date-fns installed, because a stage file's imports resolve from its own folder, not from /srv/app",
-        "Says a missing date-fns is reported as an import-failed load error for that stage file (not not-found, and not a thrown exception)",
-        "Says the @ngwes/mini-fp installed for the plugins must be on the same major version as the app's",
-        "Says type errors in the plugin files are not reported when they are loaded (the files are only transpiled), and recommends type-checking them separately (for example tsc --noEmit)",
-        "Prints the failures from the loader's result (match, mapLeft or onLeft, or a check of the awaited Either), not from a try/catch around the loader"
+        "Adds a package.json in /opt/acme-plugins that lists date-fns as a dependency",
+        "That package.json lists @ngwes/mini-fp with a 2.x range (for example ^2.0.0), the same major version as the app's",
+        "The CI step type-checks the stage files in /opt/acme-plugins with tsc --noEmit (or an equivalent check-only command), for example through a tsconfig.json in that folder",
+        "The startup code gives the dedicated message for load errors tagged 'import-failed' (a switch or check on the error's tag), not for 'not-found'",
+        "Handles the load failures as a value from the loader's result (match, mapLeft, onLeft or a check of the awaited Either), not with try/catch around the loader"
       ]
     }
   ]

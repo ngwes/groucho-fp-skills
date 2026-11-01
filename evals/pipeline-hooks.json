@@ -2,14 +2,15 @@
   "skill": "pipeline-hooks",
   "scenarios": [
     {
-      "id": "weather-default-city",
+      "id": "rollback-or-continue",
       "critical": true,
-      "prompt": "Using groucho-fp (with @ngwes/mini-fp), write a weather widget flow with three stages that run one after the other over `{ ip: string; city?: string; forecast?: Forecast; html?: string }`: locate the city with `geo.cityOf(ip): Promise<string | undefined>` (fails with { tag: 'unknown-location' } when there is none), fetch the forecast with `weather.forecastFor(city): Promise<Forecast | undefined>` (fails with { tag: 'no-forecast' }), then render the HTML. An unknown location must not fail the widget: the flow goes on with the city 'Paris' and still fetches and renders its forecast. Any other failure stops the flow. Exceptions become { tag: 'crash', cause } and overwritten values { tag: 'conflict', keys }. Write `widget(ip: string): Promise<string>` that returns the HTML or 'error: <tag>'.",
+      "prompt": "Using groucho-fp (with @ngwes/mini-fp 2), write the hook configuration for an order-saving flow over `{ orderId: string; tx?: Tx; saved?: boolean; receiptSent?: boolean }`, where `type Tx = { commit(): Promise<void>; rollback(): Promise<void> }`, with the error type `type SaveError = { tag: 'invalid-order'; reason: string } | { tag: 'receipt-failed' } | { tag: 'crash'; cause: unknown } | { tag: 'conflict'; keys: ReadonlyArray<string> } | { tag: 'rollback-failed'; cause: unknown }`. The first stage opens a database transaction and stores it as `tx`; the next stages validate and write the order; then a stage emails the receipt and fails with { tag: 'receipt-failed' } when the mail server refuses it; the last stage commits. A refused receipt must not cancel the order: the flow goes on to the commit. Any other failure, a thrown exception (as { tag: 'crash', cause }) or a stage overwriting a value an earlier stage wrote (as { tag: 'conflict', keys }) must roll the transaction back and stop with that error. The rollback itself can fail: the flow must then end with { tag: 'rollback-failed', cause }, never with a rejected promise.",
       "criteria": [
-        "Handles 'unknown-location' in the failure hook (onLeft) by returning right (or Either.right) of a context with city set to 'Paris'",
-        "The recovered context is spread from the context the hook received (for example { ...ctx, city: 'Paris' }), not a new object that drops ip",
-        "The failure hook returns left(error) for every error other than 'unknown-location'",
-        "The locate stage returns the 'unknown-location' failure as a left; the 'Paris' default is not applied inside that stage or with try/catch"
+        "On 'receipt-failed', the failure hook (onLeft) returns right of the context it received (right(ctx), or a spread of it), so the commit stage still runs",
+        "For every other error, the failure hook rolls the transaction back before returning a left",
+        "The exception hook rolls the transaction back before returning a left with tag 'crash' that holds the thrown value as cause",
+        "The conflict hook rolls the transaction back before returning a left with tag 'conflict' and the keys",
+        "A failing rollback is turned into left({ tag: 'rollback-failed', cause }) inside the hooks (TryAsync, Try, or a catch inside the hook), so no hook throws or rejects"
       ]
     },
     {
