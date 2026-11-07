@@ -1,7 +1,7 @@
 # The code tests only: `npx skill-be run --config skill-be.code-tests.yaml`.
 # Each scenario in code-evals/ has an output contract and no criteria, so the judge is never
 # called: a run is 15 scenarios x 3 reps x 2 arms = 90 generations, then the tests in skill-tests/.
-# The judged benchmark is skill-be.yaml, verified in CI from the committed skill-be.result.json.
+# The judged benchmark is skill-be.yaml. CI verifies both configs from their committed results.
 skills: ./skills
 evals: ./code-evals
 tests: ./skill-tests
@@ -29,8 +29,8 @@ withSkillTemplate: |-
 
   Task: {{task}}
 
-# This run's verdicts stay on disk; it does not touch skill-be.result.json.
-resultFile: ./.skill-be/code-tests.result.json
+# Committed, like skill-be.result.json, and read by `verify --config skill-be.code-tests.yaml`.
+resultFile: ./skill-be.code-tests.result.json
 
 # skill-be.yaml runs the typecheck. Coverage stays, for the hint-word check's list of API names.
 checks:

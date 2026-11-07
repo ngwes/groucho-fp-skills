@@ -32,6 +32,7 @@ jobs:
           cache: npm
       - run: npm ci
       - run: npx skill-be verify
+      - run: npx skill-be verify --config skill-be.code-tests.yaml
 
   release:
     needs: verify
