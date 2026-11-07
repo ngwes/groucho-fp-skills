@@ -6,16 +6,26 @@ import { MISSING_PACKAGE, NO_STAGE, inFolder, markingStage } from '../_shared/fo
 
 const test = tests<{ result: () => unknown }>();
 
+/** A list of stages (functions) or of messages (anything else). */
+function classify(list: unknown[]): { stages?: unknown[]; messages?: unknown[] } {
+  return list.every((item) => typeof item === 'function') ? { stages: list } : { messages: list };
+}
+
+function isEitherLike(value: unknown): boolean {
+  return typeof (value as { isRight?: unknown } | null)?.isRight === 'function';
+}
+
 /**
  * What loadStages resolved to: the stages or the messages, whether the code returns an Either of
- * them or the bare list.
+ * them, the bare list, or an object holding one list (such as `{ ok: false, messages }`).
  */
 async function outcome(value: unknown): Promise<{ stages?: unknown[]; messages?: unknown[] }> {
   const resolved = await value;
-  if (Array.isArray(resolved)) {
-    return resolved.every((item) => typeof item === 'function')
-      ? { stages: resolved }
-      : { messages: resolved };
+  if (Array.isArray(resolved)) return classify(resolved);
+  if (typeof resolved === 'object' && resolved !== null && !isEitherLike(resolved)) {
+    const lists = Object.values(resolved).filter((field) => Array.isArray(field));
+    assert.equal(lists.length, 1, `expected one list of stages or messages, got ${inspect(resolved)}`);
+    return classify(lists[0] as unknown[]);
   }
   const { side, value: list } = await settle(resolved);
   assert.ok(Array.isArray(list), `expected a list, got ${inspect(list)}`);
