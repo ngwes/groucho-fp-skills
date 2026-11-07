@@ -1,0 +1,13 @@
+{
+  "skill": "dynamic-steps",
+  "scenarios": [
+    {
+      "id": "load-folder-with-messages",
+      "critical": true,
+      "prompt": "Using groucho-fp, write `loadStages()` that loads, at runtime, every stage file in the `./stages` directory (TypeScript files, no build step). It resolves to the stages, or, when files cannot be loaded, to a list of human-readable messages, one per failing file, saying which file failed and the reason. It must not throw.",
+      "output": {
+        "result": "loadStages, as a function () => what the task says it resolves to"
+      }
+    }
+  ]
+}

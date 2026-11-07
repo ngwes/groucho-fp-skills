@@ -1,0 +1,13 @@
+{
+  "skill": "groucho-fp",
+  "scenarios": [
+    {
+      "id": "signup-with-optional-geo",
+      "critical": true,
+      "prompt": "Using groucho-fp (with @ngwes/mini-fp), write `subscribe(email: string): Promise<string>` for a newsletter sign-up. Three stages run one after the other over a shared object: (1) validate the email, failing with { tag: 'invalid-email' } when it has no '@'; (2) look up the subscriber's country with the existing `geo.lookup(email): Promise<string | undefined>`, failing with { tag: 'geo-unavailable' } when it returns nothing; (3) save the subscriber with the existing `store.save(email, country): Promise<void>`. A missing country is a normal case and must not stop the sign-up: it goes on with the country 'unknown'. Any other failure stops it. An unexpected exception in a stage is a failure { tag: 'crash', cause }, and a stage that overwrites a value an earlier stage wrote is a failure { tag: 'conflict', keys }. Resolve to 'subscribed: <country>' on success and 'error: <tag>' on failure.",
+      "output": {
+        "result": "a function (deps: { geo, store }) => (email: string) => a Promise of the result string"
+      }
+    }
+  ]
+}

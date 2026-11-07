@@ -89,6 +89,7 @@ npm run bench                # benchmark every skill; can take an hour
 npx skill-be run pipeline    # benchmark one skill
 npx skill-be triage          # explain why criteria failed in the latest run
 npm run bench:verify         # what CI runs; no model call
+npm run bench:code           # the code tests only (see below)
 ```
 
 `skill-be run` writes the outputs and reports under `.skill-be/` (not committed) and records each skill's verdict in `skill-be.result.json`. Commit that file with any change to a `SKILL.md`, an eval file or `skill-be.yaml`. A skill's fingerprint covers its `SKILL.md`, its eval file and `skill-be.yaml`, so editing any of them without running the benchmark again makes `verify` fail (a change to `skill-be.yaml` makes every skill stale).
@@ -99,6 +100,15 @@ npm run bench:verify         # what CI runs; no model call
 - a skill changed since its last recorded run;
 - a skill's recorded verdict is NOT READY;
 - the typecheck fails.
+
+### Code tests
+
+A judge can pass code that reads well and does not work. A code test runs the code. 15 scenarios, at least one in every skill, have a second version in `code-evals/<skill>.json`, with an `output` contract: the names the model's code must export. The tests, in `skill-tests/<skill>/<scenario id>.test.ts`, call that code with fakes (stages, hooks run through the real `Pipeline`, a transaction, a geo service, stage files written to a temp folder) and check what it returns and what it calls. They run against every answer, in both arms, and never reach the model. Each test is scored like a criterion, as `[test] <name>`, and the release gate applies to it. `test-packages.json` lists what the code and the tests may import (`@ngwes/groucho-fp` and `@ngwes/mini-fp`).
+
+They have their own config, `skill-be.code-tests.yaml`, so they run without the judged benchmark. These scenarios have no criteria, so the judge is never called: a run is 15 scenarios × 3 reps × 2 arms = 90 generations. Its verdicts go to `.skill-be/code-tests.result.json`, not to `skill-be.result.json`, and `verify` does not read them.
+
+- Locally: `npm run bench:code`, with the `claude` login, as above.
+- In CI: `.github/workflows/code-tests.yml` runs it only when started by hand from the Actions tab, on the branch of an open pull request; on any other branch it stops before calling the model. It reads the API key from the repository secret `ANTHROPIC_API_KEY`, and the job fails when a skill is NOT READY. The run's `results.html` is attached to the workflow run.
 
 ---
 

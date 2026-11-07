@@ -16,7 +16,8 @@
     "prepare": "husky",
     "bench": "skill-be run",
     "bench:check": "skill-be check",
-    "bench:verify": "skill-be verify"
+    "bench:verify": "skill-be verify",
+    "bench:code": "skill-be run --config skill-be.code-tests.yaml"
   },
   "devDependencies": {
     "@commitlint/cli": "^20.5.0",

@@ -1,0 +1,37 @@
+{
+  "skill": "pipeline",
+  "scenarios": [
+    {
+      "id": "checkout-total",
+      "critical": true,
+      "prompt": "Using groucho-fp (with @ngwes/mini-fp), write TypeScript that computes an order total in three stages that run one after the other over a shared context: check that the cart has at least one line (otherwise fail with { code: 'EMPTY_CART' }), sum the lines (price * quantity) into a subtotal, then add 20% VAT to get the total. Write `checkout(lines: Line[]): Promise<string>` that returns 'total: <amount>' on success and 'error: <code>' on failure. An unexpected exception in a stage is a failure with code 'CRASH'.",
+      "output": {
+        "result": "checkout, as a function (lines: Line[]) => a Promise of the result string"
+      }
+    },
+    {
+      "id": "signup-http-response",
+      "critical": true,
+      "prompt": "Using groucho-fp, write `handleSignup(email: string): Promise<{ status: number; body: string }>`. The signup stages already exist: `signupSteps`, written for the context `{ email: string; userId?: string }` and the error type `{ message: string }`, and `signupOptions`, their hook configuration. Run the stages starting from the email. Answer 201 with the new user id on success and 400 with the error message on failure, and log failures with `logger.warn(message)` before answering.",
+      "output": {
+        "result": "a function (deps: { signupSteps, signupOptions, logger }) => (email: string) => a Promise of { status, body }"
+      }
+    },
+    {
+      "id": "hook-configuration",
+      "critical": true,
+      "prompt": "Using groucho-fp, write the hook configuration for a pipeline over the context `{ requestId: string; payload?: Payload; saved?: boolean }` with the error type `type AppError = { tag: 'invalid'; reason: string } | { tag: 'crash'; cause: unknown } | { tag: 'conflict'; keys: ReadonlyArray<string> }`. An expected failure returned by a stage should simply stop the run with that error. A thrown exception should stop the run with a 'crash' error. A stage that overwrites a value an earlier stage wrote should stop the run with a 'conflict' error listing the keys. Keep it as short as the library allows.",
+      "output": {
+        "result": "the hook configuration object"
+      }
+    },
+    {
+      "id": "class-instance-context",
+      "critical": false,
+      "prompt": "Using groucho-fp, we have `class ImportJob { constructor(readonly fileName: string, readonly rows: string[]) {} get rowCount() { return this.rows.length; } isEmpty() { return this.rows.length === 0; } }`. Write `runImport(job: ImportJob)` that runs two stages: reject an empty job with { reason: 'empty' }, then count the rows that are valid JSON and store that count. It resolves to the count, or to the failure reason.",
+      "output": {
+        "result": "runImport, as a function (job: ImportJob) => a Promise of the count (a number) or the reason (a string)"
+      }
+    }
+  ]
+}

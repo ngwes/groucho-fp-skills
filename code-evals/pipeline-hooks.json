@@ -1,0 +1,29 @@
+{
+  "skill": "pipeline-hooks",
+  "scenarios": [
+    {
+      "id": "rollback-or-continue",
+      "critical": true,
+      "prompt": "Using groucho-fp (with @ngwes/mini-fp 2), write the hook configuration for an order-saving flow over `{ orderId: string; tx?: Tx; saved?: boolean; receiptSent?: boolean }`, where `type Tx = { commit(): Promise<void>; rollback(): Promise<void> }`, with the error type `type SaveError = { tag: 'invalid-order'; reason: string } | { tag: 'receipt-failed' } | { tag: 'crash'; cause: unknown } | { tag: 'conflict'; keys: ReadonlyArray<string> } | { tag: 'rollback-failed'; cause: unknown }`. The first stage opens a database transaction and stores it as `tx`; the next stages validate and write the order; then a stage emails the receipt and fails with { tag: 'receipt-failed' } when the mail server refuses it; the last stage commits. A refused receipt must not cancel the order: the flow goes on to the commit. Any other failure, a thrown exception (as { tag: 'crash', cause }) or a stage overwriting a value an earlier stage wrote (as { tag: 'conflict', keys }) must roll the transaction back and stop with that error. The rollback itself can fail: the flow must then end with { tag: 'rollback-failed', cause }, never with a rejected promise.",
+      "output": {
+        "result": "the hook configuration object"
+      }
+    },
+    {
+      "id": "readable-crash-message",
+      "critical": false,
+      "prompt": "Using groucho-fp with @ngwes/mini-fp 2, write the hook configuration for an import flow over `{ fileName: string; rows?: string[]; imported?: number }` with the error type `type ImportError = { tag: 'crash'; message: string; cause: unknown } | { tag: 'conflict'; keys: ReadonlyArray<string> } | { tag: 'invalid-row'; line: number }`. The stages call third-party parsers that may throw anything: Error objects, plain strings, or nothing at all (`throw undefined`, `Promise.reject()`). A thrown value must stop the run with a 'crash' error whose message is readable in every one of those cases. An overwritten value stops the run with a 'conflict' error.",
+      "output": {
+        "result": "the hook configuration object"
+      }
+    },
+    {
+      "id": "accept-timestamp-rewrite",
+      "critical": false,
+      "prompt": "Using groucho-fp, a document flow over `{ docId: string; markdown?: string; html?: string; lastModified?: Date }` has stages that each set `lastModified` to the current time after doing their work, so a later stage replaces the date an earlier one wrote. That rewrite is expected: the run must go on with the stage's new date. Any other overwrite of a value an earlier stage wrote is a bug and must stop the run with { tag: 'conflict', keys }. Exceptions become { tag: 'crash', cause }. Write the hook configuration.",
+      "output": {
+        "result": "the hook configuration object"
+      }
+    }
+  ]
+}

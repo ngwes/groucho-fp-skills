@@ -1,0 +1,39 @@
+# The code tests only: `npx skill-be run --config skill-be.code-tests.yaml`.
+# Each scenario in code-evals/ has an output contract and no criteria, so the judge is never
+# called: a run is 15 scenarios x 3 reps x 2 arms = 90 generations, then the tests in skill-tests/.
+# The judged benchmark is skill-be.yaml, verified in CI from the committed skill-be.result.json.
+skills: ./skills
+evals: ./code-evals
+tests: ./skill-tests
+
+# Locally claude uses your login (leave ANTHROPIC_API_KEY unset); in CI, the repository secret.
+model:
+  adapter: claude-cli
+  id: claude-sonnet-5-5
+  apiKeyEnv: ANTHROPIC_API_KEY
+# Required by skill-be; no scenario here has criteria, so it is not called.
+grader:
+  adapter: claude-cli
+  id: claude-haiku-5-5
+  apiKeyEnv: ANTHROPIC_API_KEY
+
+reps: 3
+
+# The same template as skill-be.yaml, so both arms see the skill the same way.
+withSkillTemplate: |-
+  You have access to the following TypeScript library. Use its APIs when writing the code.
+
+  --- LIBRARY DOCS ---
+  {{skill}}
+  --- END LIBRARY DOCS ---
+
+  Task: {{task}}
+
+# This run's verdicts stay on disk; it does not touch skill-be.result.json.
+resultFile: ./.skill-be/code-tests.result.json
+
+# skill-be.yaml runs the typecheck. Coverage stays, for the hint-word check's list of API names.
+checks:
+  typecheck: false
+  coverage:
+    entry: ./node_modules/@ngwes/groucho-fp/dist/index.d.ts
