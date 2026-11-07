@@ -96,7 +96,7 @@ npm run bench:code           # the code tests only (see below)
 
 ### In CI
 
-`.github/workflows/verify.yml` runs `npx skill-be verify` on pull requests and on pushes to `main`, then `npx skill-be verify --config skill-be.code-tests.yaml` for the [code tests](#code-tests). `release.yml` runs the same two steps in a `verify` job that the `release` job needs. They call no model and need no secrets. They fail when:
+`.github/workflows/verify.yml` runs `skill-be verify` on pull requests and on pushes to `main`, then `skill-be verify --config skill-be.code-tests.yaml` for the [code tests](#code-tests). Both steps use skill-be's GitHub Action, `ngwes/skill-be@v1`, which runs the skill-be that `npm ci` installed. `release.yml` runs the same two steps in a `verify` job that the `release` job needs. They call no model and need no secrets. They fail when:
 - a skill changed since its last recorded run;
 - a skill's recorded verdict is NOT READY;
 - the typecheck fails (`skill-be.yaml` only).
