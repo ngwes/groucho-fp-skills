@@ -1,0 +1,13 @@
+{
+  "skill": "step-composition",
+  "scenarios": [
+    {
+      "id": "fix-conflicting-stages",
+      "critical": false,
+      "prompt": "Using groucho-fp, this pipeline stops with a conflict error and never produces tokens. Fix the stages so that the run completes with the trimmed, lowercased text, its tokens and the metadata. The stages run in this order, over the initial context `{ raw, meta: { source: 'api' } }`:\n\n```ts\ntype Meta = { source: string; lang?: string };\ntype Ctx = { raw: string; meta: Meta; text?: string; tokens?: string[] };\ntype Err = { tag: 'empty' } | { tag: 'crash'; cause: unknown } | { tag: 'conflict'; keys: ReadonlyArray<string> };\n\nconst clean: Step<Err, Ctx> = (ctx) => right({ ...ctx, text: ctx.raw.trim() });\nconst lower: Step<Err, Ctx> = (ctx) => right({ ...ctx, text: (ctx.text ?? '').toLowerCase() });\nconst withDefaults: Step<Err, Ctx> = (ctx) => right({ ...ctx, meta: { lang: 'en', ...ctx.meta } });\nconst tokenize: Step<Err, Ctx> = (ctx) => {\n  const { raw, ...rest } = ctx;\n  return right({ ...rest, tokens: (ctx.text ?? '').split(/\\s+/) } as Ctx);\n};\n```",
+      "output": {
+        "result": "the fixed stages, as an array in run order"
+      }
+    }
+  ]
+}

@@ -1,0 +1,37 @@
+{
+  "skill": "step",
+  "scenarios": [
+    {
+      "id": "parse-quantity",
+      "critical": true,
+      "prompt": "Using groucho-fp, write the pipeline stage that parses `ctx.rawQuantity` (a string) into an integer `quantity`, for the context `{ rawQuantity: string; quantity?: number }`. It fails with `{ tag: 'invalid-quantity'; raw: string }` when the value is not a positive integer.",
+      "output": {
+        "result": "the stage, as a function (ctx) => its result"
+      }
+    },
+    {
+      "id": "parse-json-config",
+      "critical": true,
+      "prompt": "Using groucho-fp, write the pipeline stage that parses `ctx.rawConfig` (a JSON string) into `config`, for the context `{ rawConfig: string; config?: Config }`. Malformed JSON must become the failure `{ tag: 'bad-config'; detail: string }` (with the parser's message as detail) rather than crash the run.",
+      "output": {
+        "result": "the stage, as a function (ctx) => its result"
+      }
+    },
+    {
+      "id": "user-lookup",
+      "critical": true,
+      "prompt": "Using groucho-fp, write the pipeline stage that finds the user for `ctx.userId` in `users: Map<string, User>` and stores it as `user`, for the context `{ userId: string; user?: User }`. When there is no such user it fails with `{ tag: 'user-not-found'; userId: string }`.",
+      "output": {
+        "result": "a function (users: Map<string, User>) => the stage"
+      }
+    },
+    {
+      "id": "fetch-orders",
+      "critical": false,
+      "prompt": "Using groucho-fp, write the pipeline stage that loads the customer's orders with `api.fetchOrders(customerId: string): Promise<Order[]>` (the promise may reject on network errors) and stores them as `orders`, for the context `{ customerId: string; orders?: Order[] }`. A network failure must become the failure `{ tag: 'upstream'; cause: unknown }` instead of an exception.",
+      "output": {
+        "result": "a function (api: { fetchOrders }) => the stage"
+      }
+    }
+  ]
+}

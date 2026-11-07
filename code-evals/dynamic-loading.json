@@ -1,0 +1,13 @@
+{
+  "skill": "dynamic-loading",
+  "scenarios": [
+    {
+      "id": "workflow-between-app-stages",
+      "critical": true,
+      "prompt": "Using groucho-fp (with @ngwes/mini-fp), write `runWorkflow(orderId: string): Promise<string>`. The workflow's stages are TypeScript files in the `./workflow` folder, loaded at runtime with no build step, so operators can add stages without redeploying. They must run between two stages that are part of the app's code: `authorize` first and `summarize` last. Both already exist, typed for the context `type Ctx = { orderId: string; summary?: string }` and the error type `type AppError = { tag: string }`, and `workflowOptions` holds the hook configuration. If any file of the folder cannot be loaded, no stage may run and the function resolves to 'load failed: <number of failing files>'. Otherwise it resolves to the final context's `summary`, or to 'error: <tag>'.",
+      "output": {
+        "result": "a function (deps: { authorize, summarize, workflowOptions }) => (orderId: string) => a Promise of the result string"
+      }
+    }
+  ]
+}

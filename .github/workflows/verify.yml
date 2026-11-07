@@ -21,4 +21,8 @@ jobs:
           node-version: 24
           cache: npm
       - run: npm ci
-      - run: npx skill-be verify
+      # skill-be's GitHub Action runs the skill-be that npm ci installed.
+      - uses: ngwes/skill-be@v1
+      - uses: ngwes/skill-be@v1
+        with:
+          args: --config skill-be.code-tests.yaml
