@@ -123,3 +123,17 @@ They have their own config, `skill-be.code-tests.yaml`, so they run without the 
 | `pipeline-hooks` | Pattern: recovering with a default in `onLeft`, wrapping exceptions in `onException`, accepting or rejecting overwrites in `onConflictingKeys`, cleanup |
 | `step-composition` | Pattern: small steps sharing one context and one error union, run order, never overwriting an earlier key |
 | `dynamic-loading` | Pattern: load then run as one `EitherAsync`, load once at startup, mix app steps with loaded ones |
+
+---
+
+## Contributing
+
+See [CONTRIBUTING.md](CONTRIBUTING.md): how to report a problem, propose a change and open a pull request.
+
+## License
+
+[Apache License 2.0](https://github.com/ngwes/groucho-fp-skills/blob/main/LICENSE). Copyright 2026 ngwes.
+
+You may use, modify and redistribute groucho-fp-skills for any purpose, commercial included. If you redistribute it, or a work that contains it or is derived from it, you must keep the attribution in its [NOTICE](https://github.com/ngwes/groucho-fp-skills/blob/main/NOTICE) file: in a NOTICE file of your own, in your documentation, or wherever your product shows third-party notices, as section 4 of the license requires.
+
+To use groucho-fp-skills without that attribution, ask ngwes for a separate license by opening an issue at https://github.com/ngwes/groucho-fp-skills/issues.
